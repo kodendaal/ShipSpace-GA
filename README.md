@@ -1,6 +1,9 @@
-﻿# ShipSpace - GA
+﻿# ShipSpace-GA
 
+<!--
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+-->
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Procedural generation of conceptual 3D ship internal arrangements for design-space exploration.**
@@ -10,8 +13,8 @@
 </p>
 
 <p align="center">
-  <a href="PAPER-LINK">Paper</a> ·
-  <a href="ZENODO-DATASET-LINK">Dataset</a> ·
+ <!--  <a href="PAPER-LINK">Paper</a> · -->
+ <!-- <a href="ZENODO-DATASET-LINK">Dataset</a> · -->
   <a href="docs/">Documentation</a> ·
   <a href="CITATION.cff">Citation</a>
 </p>
