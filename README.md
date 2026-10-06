@@ -1,9 +1,6 @@
 ﻿# ShipSpace-GA
 
-<!--
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
--->
-
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23196765.svg)](https://doi.org/10.5281/zenodo.23196765)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Procedural generation of conceptual 3D ship internal arrangements for design-space exploration.**
