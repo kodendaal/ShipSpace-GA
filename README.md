@@ -1,8 +1,24 @@
 ﻿# ShipSpace - GA
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+**Procedural generation of conceptual 3D ship internal arrangements for design-space exploration.**
+
+<p align="center">
+  <img src="docs/figures/shipspace_overview.png" width="900">
+</p>
+
+<p align="center">
+  <a href="PAPER-LINK">Paper</a> ·
+  <a href="ZENODO-DATASET-LINK">Dataset</a> ·
+  <a href="docs/">Documentation</a> ·
+  <a href="CITATION.cff">Citation</a>
+</p>
+
 **Version 1.0.** This repository generates 3D internal arrangements for six ship types (bulker, tanker, general cargo, offshore support vessel, patrol vessel, motor yacht) and compares them with 23 real general arrangements.
 
-Each arrangement is stored as a graph. Every zone of the ship is a node labelled with its compartment (engine room, cargo, accommodation, fuel, ballast, ...), and touching zones are joined by edges.
+Each arrangement is stored as a voxel and graph representation. Every zone of the ship is a node labelled with its compartment (engine room, cargo, accommodation, fuel, ballast, ...), and touching zones are joined by edges.
 
 The published synthetic corpus (49,998 arrangements, 8,333 per ship type, seed 42) is archived on **Zenodo** with this release. This repository holds the generator, the validation tools, the production hull masks and the 23 real general arrangements. Place the Zenodo corpus at `data/dataset_v1` to use the defaults below, or generate a fresh corpus with the same settings.
 
