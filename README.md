@@ -19,7 +19,7 @@
   <a href="CITATION.cff">Citation</a>
 </p>
 
-**Version 1.0.** This repository generates 3D internal arrangements for six ship types (bulker, tanker, general cargo, offshore support vessel, patrol vessel, motor yacht) and compares them with 23 real general arrangements.
+**Version 1.0.** This repository generates 3D internal arrangements for six ship types (bulker, tanker, container(`CARGO` in code), offshore support vessel (OSV), patrol vessel, motor yacht) and compares them with 23 real general arrangements.
 
 Each arrangement is stored as a voxel and graph representation. Every zone of the ship is a node labelled with its compartment (engine room, cargo, accommodation, fuel, ballast, ...), and touching zones are joined by edges.
 
