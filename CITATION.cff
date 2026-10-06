@@ -1,24 +1,31 @@
 cff-version: 1.2.0
-message: "If you use this software or its dataset, please cite it as below."
-title: "Ship Internal Arrangement Generator"
+
+message: "If you use ShipSpace-GA in your research, please cite the accompanying paper."
+
+title: "ShipSpace-GA"
 type: software
 version: "1.0.0"
 license: MIT
+
 authors:
   - family-names: "Odendaal"
     given-names: "Kirsten"
     orcid: "https://orcid.org/0000-0002-4522-3828"
+
   - family-names: "de Winter"
     given-names: "Roy"
     orcid: "https://orcid.org/0000-0002-0865-4709"
+
 preferred-citation:
   type: conference-paper
   title: "Procedural Generation of 3D Ship Internal Arrangements for Design-Space Exploration"
+
   authors:
     - family-names: "Odendaal"
       given-names: "Kirsten"
+
     - family-names: "de Winter"
       given-names: "Roy"
+
   year: 2027
-  conference:
-    name: "IMDC 2027"
+  status: in-preparation
