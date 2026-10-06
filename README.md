@@ -1,4 +1,4 @@
-﻿# Ship Internal Arrangement Generator
+﻿# ShipSpace - GA
 
 **Version 1.0.** This repository generates 3D internal arrangements for six ship types (bulker, tanker, general cargo, offshore support vessel, patrol vessel, motor yacht) and compares them with 23 real general arrangements.
 
