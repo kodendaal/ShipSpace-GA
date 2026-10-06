@@ -5,13 +5,18 @@
 
 **Procedural generation of conceptual 3D ship internal arrangements for design-space exploration.**
 
+
 <p align="center">
   <img src="docs/figures/shipspace_overview.png" width="900">
 </p>
 
 <p align="center">
- <!--  <a href="PAPER-LINK">Paper</a> · -->
- <!-- <a href="ZENODO-DATASET-LINK">Dataset</a> · -->
+  <a href="https://doi.org/10.5281/zenodo.23197299">
+    <img src="https://img.shields.io/badge/Dataset_DOI-10.5281%2Fzenodo.23197299-blue.svg">
+  </a>
+</p>
+
+<p align="center">
   <a href="docs/">Documentation</a> ·
   <a href="CITATION.cff">Citation</a>
 </p>
