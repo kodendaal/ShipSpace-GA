@@ -2,9 +2,12 @@ cff-version: 1.2.0
 message: "Please cite the accompanying paper for the method, and the software and dataset DOIs for the artifacts used."
 title: "ShipSpace-GA"
 type: software
-# Candidate software release; Generator v1.0 is retained.
+# Published software release; Generator v1.0 is retained.
 version: "1.0.1"
-# Add a software DOI only after its correspondence is verified (docs/RELEASE.md).
+doi: "10.5281/zenodo.23913344"
+date-released: "2026-11-03"
+# Code license; bundled data remains CC BY 4.0.
+license: "MIT"
 repository-code: "https://github.com/kodendaal/ShipSpace-GA"
 authors:
   - family-names: "Odendaal"

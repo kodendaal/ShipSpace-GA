@@ -1,91 +1,50 @@
 # Generator v1.0: repository and archive correspondence
 
-This correction completes the P1A repository with the existing engineering
-package and aligned documentation. **Generator v1.0** remains the generator
-name. **v1.0.1** is the proposed software packaging correction.
+Software v1.0.1 was published on 3 November 2026. It completes the P1A software distribution while retaining Generator v1.0 and the published dataset v1.0.0.
 
-## Current correspondence
+## Published software
 
-Checked against GitHub and DataCite's registered DOI metadata on 3 November 2026:
+- GitHub release: https://github.com/kodendaal/ShipSpace-GA/releases/tag/v1.0.1
+- Release commit: `0839ba20688771099de47f09f0a19db4b96db057`
+- Version DOI: https://doi.org/10.5281/zenodo.23913344
+- Software concept DOI (all versions): https://doi.org/10.5281/zenodo.23196764
+- Original software v1.0.0 DOI: https://doi.org/10.5281/zenodo.23196765
+- Original v1.0.0 tag commit: `bc7c37a150da2ee730da6a6cf2760354e83cf618`
 
-| Item | Identifier | Status |
-|---|---|---|
-| Generator | Generator v1.0 | Numerical rules retained |
-| Existing GitHub release | `v1.0.0` → `bc7c37a150da2ee730da6a6cf2760354e83cf618` | Published 6 October 2026; preserve this tag |
-| Main before this correction | `ef38c461f64f44630d9372ab72235a1986e3feb3` | Three later commits, changing README/CITATION only |
-| Software v1.0.0 DOI | [10.5281/zenodo.23196765](https://doi.org/10.5281/zenodo.23196765) | Registered version v1.0.0; links to GitHub tag v1.0.0 |
-| Software concept DOI | [10.5281/zenodo.23196764](https://doi.org/10.5281/zenodo.23196764) | All software versions; verified through the version record's IsVersionOf relation |
-| Dataset v1.0.0 DOI | [10.5281/zenodo.23197299](https://doi.org/10.5281/zenodo.23197299) | Registered version v1.0.0; retain files and identifier |
-| Dataset concept DOI | [10.5281/zenodo.23197298](https://doi.org/10.5281/zenodo.23197298) | All dataset versions; verified through the version record's IsVersionOf relation |
-| P1A paper | [arXiv:2610.09585](https://arxiv.org/abs/2610.09585) | 2026 preprint |
-| Proposed software correction | `v1.0.1` | Not tagged or archived yet |
+## Corresponding dataset and paper
 
-A GitHub tag is a fixed source checkpoint. Later commits on `main` are normal
-and do not update that checkpoint. The old tag should not be moved to include
-this correction.
+- Dataset version: v1.0.0, unchanged by the software correction.
+- Dataset version DOI: https://doi.org/10.5281/zenodo.23197299
+- Dataset concept DOI (all versions): https://doi.org/10.5281/zenodo.23197298
+- Paper: https://doi.org/10.48550/arXiv.2610.09585
 
-## Complete the release in order
+The dataset record retains its original software v1.0.0 provenance. The software v1.0.1 link identifies the completed software distribution; it does not imply that the archived dataset was regenerated. Software and dataset versions are independent.
 
-1. Review and merge the P1A correction. Run the included 11 engineering tests.
-   Record the exact final commit used for the release.
-2. Open the existing software record in Zenodo and check whether ShipSpace-GA
-   is still enabled in the GitHub integration. Use the software concept DOI
-   above to keep the new archive in the existing version family.
-3. Update release metadata, then create GitHub release **v1.0.1** from the
-   final commit. Use the release-note text below. Keep Generator v1.0 as the
-   generator name.
-4. Archive it as a **new version of the existing software record**. If the
-   repository is already linked, let the GitHub integration process the
-   release. If the original record was a manual deposit, use **New version**
-   on that record and upload the exact tagged source archive. Choose one route;
-   do not create a second unrelated software deposit.
-5. Check that the new Zenodo record's version, source archive and GitHub link
-   match `v1.0.1`. Add its DOI to the GitHub release notes and update the current
-   README citation links. Leave the dataset archive unchanged.
+## Changes in software v1.0.1
 
-The software registry record links explicitly to GitHub `tree/v1.0.0`; the
-software and dataset records also link to each other. This confirms the
-registered correspondence. Zenodo file bytes and the current account
-integration settings were not accessible, so archive-byte equality and the
-current automatic-deposit setting were not checked. The concept DOIs above
-come from registered relations, not inferred neighbouring record numbers.
+- Restore the existing engineering package for calibrated mass, LCG/KG, adjacency, hydrostatics, trim and free-surface-corrected GM evaluation.
+- Include calibration, native-geometry adapters, the CSV/JSONL runner and 11 existing engineering tests.
+- Align the README, schema documentation, physics guide and paper citation.
+- Use Generator v1.0 in current comments and output version labels.
 
-`CITATION.cff` identifies candidate software v1.0.1 and the P1A paper. Its
-top-level software DOI is absent until v1.0.1 receives its own identifier;
-the v1.0.0 DOI must not be labelled as a newly archived version.
-For a manual Zenodo version, reserve its DOI before making the final tag if
-the DOI must be embedded in that tagged source. For automatic archiving, keep
-the tag fixed and add the minted DOI to the release description and a later
-documentation commit. That later commit is not itself the archived checkpoint.
+Numerical generation rules, tensor layouts, hull masks and archived reference data are unchanged. See [VALIDATION.md](VALIDATION.md) for the integration checks and their limits. These checks do not constitute a rerun of the paper experiments.
 
-## Release notes for v1.0.1
+## Archive verification
 
-ShipSpace-GA v1.0.1 completes the P1A software distribution for Generator v1.0.
+On 3 November 2026, the new Zenodo record and DataCite registry identified software v1.0.1 as a version of the existing software concept DOI. The GitHub tag resolved to the merged correction commit above.
 
-- Restore the existing `src/engineering/` package, including the P1A mass,
-  adjacency, hydrostatics, trim and free-surface calculations, calibration,
-  native-geometry adapters and CSV/JSONL runner.
-- Include the 11 existing engineering tests and October input-validation fixes.
-- Align the README, dataset schema, physics guide and paper citation.
-- Use Generator v1.0 in current source labels and documentation. The producer
-  and bundle labels on newly generated files are updated; numerical generation,
-  tensor layouts, stored datasets and archived labels are unchanged.
+The downloaded Zenodo ZIP contained all 68 expected repository files. Every file matched the prepared and reviewed repository; there were no missing, differing or extra files. Its MD5 matched the Zenodo manifest: `c5d48a45445f37c8da26f68147968948`.
 
-This is a software packaging correction. The original v1.0.0 tag and published
-50K dataset remain historical references. The included integration checks do
-not constitute a rerun of the paper experiments.
+## Citation and later documentation edits
 
-At publication, append the final commit, new software version DOI, verified
-software concept DOI, unchanged dataset DOI and validation result.
+Cite the version DOI for the software actually used and the dataset DOI for the data used. The concept DOIs identify the respective version families.
 
-## Verification sources
+The software DOI was minted after publication. Later documentation commits add it to CITATION.cff and README and update this release record. Those commits are not part of the archived v1.0.1 source snapshot. Keep the published v1.0.0 and v1.0.1 tags and archived files fixed.
 
-- [Software DOI registry metadata](https://api.datacite.org/dois/10.5281/zenodo.23196765)
-- [Dataset DOI registry metadata](https://api.datacite.org/dois/10.5281/zenodo.23197299)
-- [Existing GitHub release](https://github.com/kodendaal/ShipSpace-GA/releases/tag/v1.0.0)
+The code is MIT-licensed. Bundled data is CC BY 4.0, as stated in the repository README. The current Zenodo software record identifies both licenses; its description states their scopes. The separate dataset record remains CC BY 4.0.
 
-## Official guidance
+## Software, dataset and paper links
 
-- [Zenodo DOI versioning](https://support.zenodo.org/help/en-gb/1-upload-deposit/97-what-is-doi-versioning)
-- [Manage versions](https://help.zenodo.org/docs/deposit/manage-versions/)
-- [Archive a GitHub release](https://help.zenodo.org/docs/github/archive-software/github-upload/)
+The published Zenodo records were checked on 3 November 2026. The software record links to its GitHub v1.0.1 tag, the dataset and the paper. The dataset links to both the original software v1.0.0 and the completed software v1.0.1 distribution, and to the paper.
+
+The reciprocal software-dataset relations preserve the existing convention: software is a supplement to the dataset, and the dataset is supplemented by the software. Each record's version-family relation is managed by Zenodo.
