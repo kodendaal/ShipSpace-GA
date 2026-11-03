@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ShipSpace-GA | Procedural generation of conceptual 3D ship internal arrangements</title>
-<meta name="description" content="ShipSpace-GA generates conceptual 3D internal arrangements for six ship types. Paper, 50K synthetic dataset, code, validation against 23 real general arrangements, and citation.">
-<meta name="author" content="Kirsten Odendaal, Roy de Winter">
+<meta name="description" content="ShipSpace-GA generates conceptual 3D internal arrangements for six vessel families. Paper, dataset of 50,000 generated arrangements, code, comparison with 23 real references, and citation.">
+<meta name="author" content="Kirsten Odendaal">
 <link rel="canonical" href="https://kodendaal.github.io/ShipSpace-GA/">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#12233b">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="ShipSpace-GA: procedural generation of conceptual 3D ship internal arrangements">
-<meta property="og:description" content="A generator and a 50K dataset of 3D ship internal arrangements for six vessel families, compared with 23 real general arrangements.">
+<meta property="og:description" content="A generator and a dataset of 50,000 3D ship internal arrangements for six vessel families, compared with 23 real references.">
 <meta property="og:url" content="https://kodendaal.github.io/ShipSpace-GA/">
 <meta property="og:image" content="https://kodendaal.github.io/ShipSpace-GA/assets/social-card.png">
 <meta property="og:image:width" content="1200">
@@ -29,7 +29,7 @@
     {
       "@type": "ScholarlyArticle",
       "headline": "Procedural Generation of Conceptual 3D Ship Internal Arrangements for Design-Space Exploration",
-      "url": "https://arxiv.org/abs/2610.09585",
+      "url": "https://doi.org/10.48550/arXiv.2610.09585",
       "identifier": "https://doi.org/10.48550/arXiv.2610.09585",
       "datePublished": "2026",
       "author": [
@@ -46,8 +46,7 @@
       "programmingLanguage": "Python",
       "license": "https://opensource.org/licenses/MIT",
       "author": [
-        {"@type": "Person", "name": "Kirsten Odendaal", "sameAs": "https://orcid.org/0000-0002-4522-3828"},
-        {"@type": "Person", "name": "Roy de Winter", "sameAs": "https://orcid.org/0000-0002-0865-4709"}
+        {"@type": "Person", "name": "Kirsten Odendaal", "sameAs": "https://orcid.org/0000-0002-4522-3828"}
       ]
     }
   ]
@@ -287,6 +286,13 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .data-table td, .data-table th { white-space: nowrap; padding-right: 1rem; }
 
 /* Generator stages */
+.flow { margin: 2rem 0 0; }
+.flow img { width: 100%; height: auto; }
+.flow .caption { margin-top: .9rem; }
+@media (max-width: 48rem) {
+  .flow-scroll { display: block; overflow-x: auto; }
+  .flow-scroll img { width: 48rem; max-width: none; }
+}
 .stages { list-style: none; margin: 2rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0 1.4rem; counter-reset: stage; }
 .stages li { counter-increment: stage; border-top: 2px solid var(--ink); padding-top: .9rem; }
 .stages li::before {
@@ -396,6 +402,7 @@ footer p { margin: 0; }
         <li><a href="#data">Data</a></li>
         <li><a href="#validation">Validation</a></li>
         <li><a href="#start">Get started</a></li>
+        <li><a href="#releases">Releases</a></li>
         <li><a href="#cite">Citation</a></li>
       </ul>
     </nav>
@@ -417,7 +424,7 @@ footer p { margin: 0; }
       </div>
 
       <ul class="links">
-        <li><a class="btn" href="https://arxiv.org/abs/2610.09585">
+        <li><a class="btn" href="https://doi.org/10.48550/arXiv.2610.09585">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M5 2.5h7l3.5 3.5v11.5H5z"/><path d="M12 2.5V6h3.5M7.8 10h5.4M7.8 13h5.4"/></svg>
           Paper</a></li>
         <li><a class="btn" href="https://doi.org/10.5281/zenodo.23197299">
@@ -446,16 +453,16 @@ footer p { margin: 0; }
             <li style="left:74.8%;top:32.3%">Bulk carrier</li>
             <li style="left:25.2%;top:64.9%">Patrol vessel</li>
             <li style="left:74.8%;top:64.9%">Tanker</li>
-            <li style="left:25.2%;top:97.8%">Motor yacht</li>
+            <li style="left:25.2%;top:97.8%">Yacht</li>
             <li style="left:74.8%;top:97.8%">Container vessel</li>
           </ul>
         </div>
         <figcaption>
-          <p class="caption" id="morph-cap">Six generated arrangements, one per vessel family. The voxels collapse into the zone graph. Zones of the same function then merge into the connected-compartment graph. The loop then runs back to the voxels.</p>
+          <p class="caption" id="morph-cap">Six generated arrangements, one per vessel family. The voxels collapse into the spatial graph. Zones of the same function then merge into the connected-compartment graph. The loop then runs back to the voxels.</p>
           <ul class="morph-key" aria-label="Position of each vessel family in the animation">
             <li>Offshore support vessel</li><li>Bulk carrier</li>
             <li>Patrol vessel</li><li>Tanker</li>
-            <li>Motor yacht</li><li>Container vessel</li>
+            <li>Yacht</li><li>Container vessel</li>
           </ul>
           <ul class="legend" aria-label="Compartment colours">
             <li><span class="sw" style="--c: var(--c-engine)"></span>Engine room</li>
@@ -483,20 +490,20 @@ footer p { margin: 0; }
       <div class="prose">
         <h2 id="h-overview">Overview</h2>
         <p>ShipSpace-GA generates conceptual 3D internal arrangements of ships. It places functional compartments inside a hull for six vessel families. Each layout starts from a sampled brief of main dimensions and compartment volumes.</p>
-        <p>Every arrangement is stored as a voxel grid and as a graph. Each zone of the ship becomes a node labelled with its compartment. Zones that touch are joined by edges.</p>
-        <p>We release 50K synthetic arrangements with fixed train, validation and test splits. We compare them with 23 general arrangements reconstructed from real ships. The repository holds the generator, the validation tools and an engineering evaluator.</p>
+        <p>Every arrangement is stored as a voxel grid and as a spatial graph. Each zone of the ship becomes a node labelled with its compartment. Zones that touch are joined by edges.</p>
+        <p>We release a dataset of 50,000 generated arrangements with fixed train, validation and test splits. We compare it with 23 real references. These are general arrangements reconstructed from real ships. The repository holds the generator and the tools to validate and evaluate it.</p>
       </div>
       <aside class="particulars" aria-labelledby="h-particulars">
         <h3 id="h-particulars">Principal particulars</h3>
         <dl>
-          <dt>Synthetic arrangements</dt><dd>50K</dd>
+          <dt>Generated arrangements</dt><dd>50,000</dd>
           <dt>Vessel families</dt><dd>6</dd>
           <dt>Real references</dt><dd>23</dd>
           <dt>Hull templates</dt><dd>17</dd>
           <dt>Voxel grid</dt><dd>64 × 32 × 32</dd>
           <dt>Compartment classes</dt><dd>9</dd>
           <dt>Train, val, test</dt><dd>80 / 10 / 10 %</dd>
-          <dt>Generator</dt><dd>v1.0</dd>
+          <dt>Software</dt><dd>v1.0.1</dd>
         </dl>
       </aside>
     </div>
@@ -505,7 +512,7 @@ footer p { margin: 0; }
   <section class="block" id="families" aria-labelledby="h-families">
     <div class="wrap">
       <h2 id="h-families">Six vessel families</h2>
-      <p class="lede">Each family has its own range of dimensions and its own functional programme. The bars show the programme of the 23 reconstructed real ships. Each bar is one ship, split by share of internal volume. Hover over or tap a bar to read its values.</p>
+      <p class="lede">Each family has its own range of dimensions and its own functional programme. The bars show the programme of the 23 real references. Each bar is one ship, split by share of internal volume. Hover over or tap a bar to read its values.</p>
 
       <div class="chart" id="chart">
         <ul class="legend" id="chart-legend" aria-label="Programme colours"></ul>
@@ -555,13 +562,20 @@ footer p { margin: 0; }
   <section class="block" id="generator" aria-labelledby="h-generator">
     <div class="wrap">
       <h2 id="h-generator">How the generator works</h2>
-      <p class="lede">Generation runs in six stages. A sample enters the corpus only after it passes the production quality checks.</p>
+      <p class="lede">The figure shows the workflow from the paper. The list below maps each stage to its module in the code.</p>
+      <figure class="flow">
+        <a class="flow-scroll" href="assets/generator_flow.png" aria-label="Open the workflow figure at full size">
+          <img src="assets/generator_flow.png" width="1564" height="796" loading="lazy"
+               alt="Flow chart of the generation workflow. Design sampling picks a hull and superstructure from the geometry dataset. A valid hull is split into a spatial subdivision. Functions are assigned through eligibility and pre-placement, greedy assignment, then repair and refinement. Samples that pass quality control are stored as paired representations until the dataset is complete. A separate branch reconstructs real general arrangements into a 3D GA dataset. Both datasets feed evaluation and design application.">
+        </a>
+        <figcaption class="caption">Generation and evaluation workflow. A sampled design intent and hull set the spatial subdivision. Functions are then assigned and refined. Each sample must pass quality control before it is stored. An inner loop builds up to five layouts per subdivision. An outer loop repeats until the dataset holds 50,000 arrangements. A separate branch maps real general arrangements to the same representations.</figcaption>
+      </figure>
       <ol class="stages">
         <li><h3>Sample the brief</h3><p>Draws the ship type, the main dimensions and the compartment volume budgets.</p><code>ship_params.py</code></li>
         <li><h3>Fit the hull</h3><p>Picks a hull template for the family and scales it to the sampled size. A superstructure is added on deck.</p><code>hull_mask.py</code></li>
         <li><h3>Subdivide</h3><p>Bulkheads, decks and side zones split the hull into zones.</p><code>bulkhead_placement.py</code></li>
-        <li><h3>Assign functions</h3><p>Gives every zone a compartment. A greedy fill comes first. Repair passes and an LCG/KG optimisation follow.</p><code>compartment_assignment.py</code></li>
-        <li><h3>Encode</h3><p>Builds the zone graph and the 64 × 32 × 32 voxel grid.</p><code>graph_builder.py</code></li>
+        <li><h3>Assign functions</h3><p>Places fixed functions first, like steering gear and the engine room. Greedy assignment fills the remaining zones. Repair and refinement follow.</p><code>compartment_assignment.py</code></li>
+        <li><h3>Encode</h3><p>Builds the spatial graph and the 64 × 32 × 32 voxel grid.</p><code>graph_builder.py</code></li>
         <li><h3>Check and package</h3><p>Runs the quality checks. Accepted samples go into train, validation and test shards.</p><code>dataset_builder.py</code></li>
       </ol>
       <p class="chart-note">Parameter ranges, zone eligibility and the assignment rules are in <a href="https://github.com/kodendaal/ShipSpace-GA/blob/main/docs/GENERATOR.md">the generator specification</a>. The acceptance checks are in <a href="https://github.com/kodendaal/ShipSpace-GA/blob/main/docs/QC.md">the QC summary</a>.</p>
@@ -571,10 +585,10 @@ footer p { margin: 0; }
   <section class="block" id="data" aria-labelledby="h-data">
     <div class="wrap">
       <h2 id="h-data">What each sample contains</h2>
-      <p class="lede">Each sample is a PyTorch Geometric graph with voxel fields attached. Shards hold up to 500 graphs each.</p>
+      <p class="lede">Each sample is a spatial graph in PyTorch Geometric format. Its voxel fields are stored on the same object. Shards hold up to 500 samples each.</p>
       <div class="two">
         <div>
-          <h3>Graph</h3>
+          <h3>Spatial graph</h3>
           <dl class="fields">
             <div><dt>x</dt><dd>19 geometric features per zone</dd></div>
             <div><dt>y</dt><dd>Compartment class per zone</dd></div>
@@ -602,8 +616,8 @@ footer p { margin: 0; }
       <h2 id="h-validation">Validation against real ships</h2>
       <div class="validation-grid">
         <div class="prose">
-          <p>The validation tool compares a synthetic corpus with the 23 reconstructed real arrangements. It runs two comparisons. The first uses every stored graph as generated. The second re-extracts 833 graphs per family as connected regions of equal function. This is the same extraction used for the real ships.</p>
-          <p>Results for the published corpus are in <a href="https://arxiv.org/abs/2610.09585">the paper</a>.</p>
+          <p>The validation tool compares a generated dataset with the 23 real references. It runs two comparisons. The first uses every stored spatial graph as generated. The second re-extracts 833 arrangements per family as connected-compartment graphs. This is the same extraction used for the real references.</p>
+          <p>Results for the published dataset are in <a href="https://doi.org/10.48550/arXiv.2610.09585">the paper</a>.</p>
 
           <h3 class="subhead">Engineering evaluator</h3>
           <p>A separate evaluator computes calibrated whole-ship quantities for existing arrangements. It returns LCG, KG and an adjacency cost. It can also solve the equilibrium trim and a GM corrected for free surface. See <a href="https://github.com/kodendaal/ShipSpace-GA/blob/main/docs/ENGINEERING.md">the engineering guide</a>.</p>
@@ -621,7 +635,7 @@ footer p { margin: 0; }
               <tr><td>MMD</td><td>Graph structure through degree and clustering distributions</td></tr>
               <tr><td>Adjacency</td><td>Which compartment classes touch</td></tr>
               <tr><td>Centroid KS</td><td>Where each compartment class sits in the ship</td></tr>
-              <tr><td>Coverage</td><td>Share of real ships with a close synthetic neighbour in design-parameter space</td></tr>
+              <tr><td>Coverage</td><td>Share of real references with a close generated neighbour in design-parameter space</td></tr>
             </tbody>
           </table>
         </div>
@@ -641,18 +655,18 @@ cd ShipSpace-GA
 pip install -r requirements.txt</code></pre></div>
         </div>
         <div>
-          <h3>Generate a small corpus</h3>
+          <h3>Generate a small dataset</h3>
           <p>Ten arrangements per family, written to <code>data/test_run</code>.</p>
           <div class="code"><pre><code>python generate.py --out data/test_run --per-type 10 --workers 6</code></pre></div>
         </div>
         <div>
-          <h3>Compare with the real ships</h3>
-          <p>Writes metrics, per-family reports and comparison figures. The full 50K corpus needs about 10 GB of RAM.</p>
+          <h3>Compare with the real references</h3>
+          <p>Writes metrics, per-family reports and comparison figures. The full dataset needs about 10 GB of RAM.</p>
           <div class="code"><pre><code>python validate.py --dataset data/test_run --out validation_test --per-type 10</code></pre></div>
         </div>
         <div>
-          <h3>Load the published corpus</h3>
-          <p>Download the corpus from <a href="https://doi.org/10.5281/zenodo.23197299">Zenodo</a> and place it at <code>data/dataset_v1</code>.</p>
+          <h3>Load the published dataset</h3>
+          <p>Download the dataset from <a href="https://doi.org/10.5281/zenodo.23197299">Zenodo</a> and place it at <code>data/dataset_v1</code>.</p>
           <div class="code"><pre><code>import sys
 sys.path.insert(0, "src/data_generator")
 from dataset_builder import load_split
@@ -671,26 +685,24 @@ g = graphs[0]</code></pre></div>
       <div class="titleblock">
         <div class="tb-top">
           <div><span class="tb-label">Project</span><span class="tb-value big">ShipSpace-GA</span></div>
-          <div><span class="tb-label">Authors</span><span class="tb-value">K. Odendaal, R. de Winter</span></div>
-          <div><span class="tb-label">Institution</span><span class="tb-value">TU Delft</span></div>
+          <div><span class="tb-label">Created by</span><span class="tb-value">K. Odendaal</span></div>
+          <div><span class="tb-label">Supervisor</span><span class="tb-value">R. de Winter</span></div>
         </div>
         <table>
           <caption class="sr-only">Archived records and their identifiers</caption>
           <colgroup><col style="width:40%"><col style="width:30%"><col style="width:30%"></colgroup>
           <thead><tr><th scope="col">Record</th><th scope="col">Version</th><th scope="col">Identifier</th></tr></thead>
           <tbody>
-            <tr><td>Paper</td><td>arXiv</td><td><a href="https://doi.org/10.48550/arXiv.2610.09585">10.48550/arXiv.2610.09585</a></td></tr>
-            <tr><td>Dataset</td><td>1.0.0</td><td><a href="https://doi.org/10.5281/zenodo.23197299">10.5281/zenodo.23197299</a></td></tr>
-            <tr><td>Software</td><td>1.0.1</td><td><a href="https://doi.org/10.5281/zenodo.23913344">10.5281/zenodo.23913344</a></td></tr>
-            <tr><td>Software</td><td>1.0.0</td><td><a href="https://doi.org/10.5281/zenodo.23196765">10.5281/zenodo.23196765</a></td></tr>
-            <tr><td>Software, all versions</td><td>Concept</td><td><a href="https://doi.org/10.5281/zenodo.23196764">10.5281/zenodo.23196764</a></td></tr>
-            <tr><td>Dataset, all versions</td><td>Concept</td><td><a href="https://doi.org/10.5281/zenodo.23197298">10.5281/zenodo.23197298</a></td></tr>
+            <tr><td>Paper</td><td>Preprint</td><td><a href="https://doi.org/10.48550/arXiv.2610.09585">10.48550/arXiv.2610.09585</a></td></tr>
+            <tr><td>Dataset</td><td>v1.0.0</td><td><a href="https://doi.org/10.5281/zenodo.23197299">10.5281/zenodo.23197299</a></td></tr>
+            <tr><td>Software</td><td>v1.0.1</td><td><a href="https://doi.org/10.5281/zenodo.23913344">10.5281/zenodo.23913344</a></td></tr>
+            <tr><td>GitHub release</td><td>v1.0.1</td><td><a href="https://github.com/kodendaal/ShipSpace-GA/releases/tag/v1.0.1">ShipSpace-GA v1.0.1</a></td></tr>
           </tbody>
         </table>
         <div class="tb-foot">
           <div><span class="tb-label">Code licence</span><span class="tb-value">MIT</span></div>
           <div><span class="tb-label">Data licence</span><span class="tb-value">CC BY 4.0</span></div>
-          <div><span class="tb-label">Latest software release</span><span class="tb-value">3 November 2026</span></div>
+          <div><span class="tb-label">Institution</span><span class="tb-value">TU Delft</span></div>
         </div>
       </div>
       <p class="chart-note">How the GitHub tags, Zenodo records and paper relate is set out in <a href="https://github.com/kodendaal/ShipSpace-GA/blob/main/docs/RELEASE.md">the release record</a>.</p>
@@ -700,10 +712,11 @@ g = graphs[0]</code></pre></div>
   <section class="block" id="cite" aria-labelledby="h-cite">
     <div class="wrap">
       <h2 id="h-cite">Citation</h2>
-      <p class="lede">Cite the paper for the method. Add the software and dataset DOIs for the versions you used. The dataset BibTeX is on <a href="https://doi.org/10.5281/zenodo.23197299">its Zenodo record</a>.</p>
+      <p class="lede">Cite the paper for the method. Add the software and dataset DOIs for the versions you used.</p>
       <div class="tabs" role="tablist" aria-label="BibTeX entries">
         <button class="tab" role="tab" id="tab-paper" aria-selected="true" aria-controls="panel-paper">Paper</button>
         <button class="tab" role="tab" id="tab-software" aria-selected="false" aria-controls="panel-software" tabindex="-1">Software v1.0.1</button>
+        <button class="tab" role="tab" id="tab-dataset" aria-selected="false" aria-controls="panel-dataset" tabindex="-1">Dataset v1.0.0</button>
       </div>
       <div class="tabpanel" id="panel-paper" role="tabpanel" aria-labelledby="tab-paper">
         <div class="code"><pre><code>@misc{odendaal2026shipspace,
@@ -712,19 +725,28 @@ g = graphs[0]</code></pre></div>
   year          = {2026},
   eprint        = {2610.09585},
   archivePrefix = {arXiv},
-  doi           = {10.48550/arXiv.2610.09585},
-  url           = {https://arxiv.org/abs/2610.09585}
+  primaryClass  = {cs.CE},
+  doi           = {10.48550/arXiv.2610.09585}
 }</code></pre></div>
       </div>
       <div class="tabpanel" id="panel-software" role="tabpanel" aria-labelledby="tab-software" hidden>
         <div class="code"><pre><code>@software{odendaal2026shipspacega,
   title     = {ShipSpace-GA},
-  author    = {Odendaal, Kirsten and de Winter, Roy},
+  author    = {Odendaal, Kirsten},
   year      = {2026},
   version   = {1.0.1},
   publisher = {Zenodo},
   doi       = {10.5281/zenodo.23913344},
-  url       = {https://github.com/kodendaal/ShipSpace-GA}
+  url       = {https://github.com/kodendaal/ShipSpace-GA/releases/tag/v1.0.1}
+}</code></pre></div>
+      <div class="tabpanel" id="panel-dataset" role="tabpanel" aria-labelledby="tab-dataset" hidden>
+        <div class="code"><pre><code>@dataset{odendaal2026shipspacedataset,
+  title     = {ShipSpace-Dataset: A Procedurally Generated Dataset of 3D Ship Internal Arrangements},
+  author    = {Odendaal, Kirsten},
+  year      = {2026},
+  version   = {1.0.0},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.23197299}
 }</code></pre></div>
       </div>
     </div>
@@ -733,8 +755,8 @@ g = graphs[0]</code></pre></div>
 
 <footer>
   <div class="wrap">
-    <p>ShipSpace-GA by <a href="https://kodendaal.github.io/">Kirsten Odendaal</a> and Roy de Winter, Delft University of Technology.</p>
-    <p>Code under MIT. Data under CC BY 4.0.</p>
+    <p>ShipSpace-GA is created by <a href="https://kodendaal.github.io/">Kirsten Odendaal</a> at Delft University of Technology. Roy de Winter is the supervisor.</p>
+    <p>Code licensed under MIT. Bundled data licensed under CC BY 4.0.</p>
   </div>
 </footer>
 
@@ -760,7 +782,7 @@ g = graphs[0]</code></pre></div>
     { key: "container", name: "Container vessel",        L: "230–300 m" },
     { key: "osv",       name: "Offshore support vessel", L: "50–95 m" },
     { key: "patrol",    name: "Patrol vessel",           L: "55–85 m" },
-    { key: "yacht",     name: "Motor yacht",             L: "50–100 m" }
+    { key: "yacht",     name: "Yacht",                   L: "50–100 m" }
   ];
 
   // Programme fractions of the 23 real references (data/real_ga/real_ga_meta.json, budget_fracs).
