@@ -159,7 +159,7 @@ def _source_tree_sha256() -> str:
 SPLIT_RATIOS = {"train": 0.80, "val": 0.10, "test": 0.10}
 SHARD_SIZE = 500
 ENCODING = "dataset_v1"
-BUNDLE_SCHEMA = "v542_enc2_reference_bundle_1"
+BUNDLE_SCHEMA = "shipspace_ga_v1_enc2_reference_bundle_1"
 
 DEFAULT_TYPE_WEIGHTS = {
     ShipType.BULKER:  2.0,

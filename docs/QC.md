@@ -27,7 +27,7 @@ The sampled `LCG/L` and `KG/D` values guide assignment and label refinement, but
 
 ### GM
 
-The generator records a proxy transverse metacentric-height quantity and associated diagnostics, but GM is not an active production dataset QC rejection gate. The more detailed corrected-GM calibration used in the paper's fixed-hull application is a separate evaluation model and should not be conflated with the generator's internal stored proxy quantity.
+The generator records a proxy transverse metacentric-height quantity and associated diagnostics, but GM is not an active production dataset QC rejection gate. The separate [P1A engineering evaluator](ENGINEERING.md) computes corrected GM from solved hydrostatics, calibrated whole-ship KG and a free-surface correction. Its outputs must not be substituted for the generator's stored proxy. Restoring this evaluator does not introduce a GM rejection gate into dataset generation.
 
 ## Canonical implementation
 

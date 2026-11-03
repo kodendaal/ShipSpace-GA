@@ -1,6 +1,6 @@
 ﻿# ShipSpace-GA
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23196765.svg)](https://doi.org/10.5281/zenodo.23196765)
+[![Software DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23196764.svg)](https://doi.org/10.5281/zenodo.23196764)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Procedural generation of conceptual 3D ship internal arrangements for design-space exploration.**
@@ -17,15 +17,19 @@
 </p>
 
 <p align="center">
+  <a href="https://arxiv.org/abs/2610.09585">Paper</a> ·
+  <a href="https://doi.org/10.5281/zenodo.23197299">Dataset</a> ·
   <a href="docs/">Documentation</a> ·
   <a href="CITATION.cff">Citation</a>
 </p>
 
-**Version 1.0.** This repository generates 3D internal arrangements for six ship types (bulker, tanker, container(`CARGO` in code), offshore support vessel (OSV), patrol vessel, motor yacht) and compares them with 23 real general arrangements.
+**Generator v1.0.** This repository generates 3D internal arrangements for six ship types (bulker, tanker, container vessel (`CARGO` in code), offshore support vessel (OSV), patrol vessel, motor yacht) and compares them with 23 real general arrangements.
 
 Each arrangement is stored as a voxel and graph representation. Every zone of the ship is a node labelled with its compartment (engine room, cargo, accommodation, fuel, ballast, ...), and touching zones are joined by edges.
 
-The published synthetic corpus (49,998 arrangements, 8,333 per ship type, seed 42) is archived on **Zenodo** with this release. This repository holds the generator, the validation tools, the production hull masks and the 23 real general arrangements. Place the Zenodo corpus at `data/dataset_v1` to use the defaults below, or generate a fresh corpus with the same settings.
+The published **50K synthetic corpus** has its own [dataset DOI](https://doi.org/10.5281/zenodo.23197299). This repository contains the generator, validation tools, P1A engineering evaluator, production hull masks and 23 reconstructed real general arrangements. Place the archived corpus at `data/dataset_v1` to use the defaults below.
+
+This branch prepares software release **v1.0.1**, completing the P1A repository while retaining Generator v1.0. The existing `v1.0.0` tag and archived dataset remain unchanged. See the [release correspondence and checklist](docs/RELEASE.md).
 
 ## Install
 
@@ -35,7 +39,11 @@ Python 3.10 or newer:
 pip install -r requirements.txt
 ```
 
-Tested with Python 3.13, NumPy 2.4, SciPy 1.17, PyTorch 2.11 and PyTorch Geometric 2.7.
+Run the included engineering checks after installation:
+
+```bash
+python -m unittest discover -s tests -p "test_engineering_dropin.py" -v
+```
 
 ## 1. Generate a dataset
 
@@ -43,9 +51,9 @@ Tested with Python 3.13, NumPy 2.4, SciPy 1.17, PyTorch 2.11 and PyTorch Geometr
 python generate.py
 ```
 
-By default this writes a new corpus to `data/dataset_v1` using the published settings: 8,333 arrangements per ship type, seed 42, 16 workers. A full run takes about 75 minutes with 16 parallel processes. The final merge holds the whole dataset in memory, which takes roughly 25 GB of RAM.
+By default this requests a new corpus at `data/dataset_v1`: 8,333 arrangements per ship type, seed 42 and 16 random streams. Use the deposited corpus for the published samples. A fresh run with matching settings does not by itself establish sample-for-sample reproduction. The final merge holds the dataset in memory; runtime and memory depend on the environment.
 
-For a quick test (about 20 seconds):
+For a small generation run:
 
 ```bash
 python generate.py --out data/test_run --per-type 10 --workers 6
@@ -70,6 +78,17 @@ Each folder contains `similarity_metrics.json` / `.csv` (label JSD, KS tests, MM
 
 To validate another dataset, use `--dataset`, for example `python validate.py --dataset data/test_run --out validation_test --per-type 10`.
 
+## 3. Evaluate P1A engineering quantities
+
+The restored `src/engineering/` package evaluates existing native arrangements. It provides calibrated LCG/KG and adjacency cost (`J_adj`), with optional equilibrium trim and free-surface-corrected GM.
+
+```bash
+python -m src.engineering.cli --input native_cases --output metrics.csv
+python -m src.engineering.cli --input native_case.npz --output metrics.jsonl --equilibrium
+```
+
+Inputs must include native labels, fractional occupancy and physical dimensions. The resampled `64 × 32 × 32` voxel view is not a substitute for native geometry. See [ENGINEERING.md](docs/ENGINEERING.md) for input fields and examples. The existing 11 tests check the recovered implementation and adapters; they are not a rerun of the paper experiments.
+
 ## Repository layout
 
 ```text
@@ -77,6 +96,8 @@ generate.py              generate a dataset
 validate.py              compare a dataset with the real general arrangements
 src/data_generator/      the generator
 src/validation/          comparison with the real general arrangements
+src/engineering/         P1A mass, adjacency, trim and corrected-GM evaluation
+tests/                   engineering integrity and integration checks
 data/hull_cache/         17 voxelised hull forms (64 x 32 x 24 cells)
 data/real_ga/            the 23 real general arrangements as graphs
 ```
@@ -92,7 +113,7 @@ The generator runs in six stages:
 | 5 | `graph_builder.py`, `representation_converters.py` | zone graph and 64 x 32 x 32 voxel grids |
 | 6 | `dataset_builder.py`, `companion.py`, `deck_codec.py` | quality checks, companions, train/val/test split, shard bundles |
 
-`volume_metrics.py` and `validation_constants.py` hold the volume, LCG/KG/GM and label definitions shared by the generator and the validation.
+`volume_metrics.py` and `validation_constants.py` hold shared volume, generator-diagnostic and label definitions. The calibrated whole-ship physics in `src/engineering/` is a separate evaluation layer. The generator GM proxy is not the corrected GM used in the fixed-hull application.
 
 The validation modules:
 
@@ -150,7 +171,7 @@ Compartment classes:
 | 6 | ballast tanks |
 | 7 | steering gear |
 | 8 | stores |
-| 9 | navigation (not used) |
+| 9 | legacy navigation (not assigned by the generator; retained in real references) |
 | 10 | outside the ship |
 
 `load_split(..., with_companions=True)` also attaches the companion of each graph. Its arrays are described at the top of `src/data_generator/companion.py`.
@@ -165,6 +186,8 @@ Further detail is in `docs/`:
 | [`docs/DATASET.md`](docs/DATASET.md) | Corpus identity, graph/voxel schema and loading |
 | [`docs/QC.md`](docs/QC.md) | Production acceptance checks vs diagnostic-only quantities |
 | [`docs/PROVENANCE.md`](docs/PROVENANCE.md) | Hull-template sources and the 23 reconstructed real GAs |
+| [`docs/ENGINEERING.md`](docs/ENGINEERING.md) | P1A physics inputs, API, batch runner and checks |
+| [`docs/RELEASE.md`](docs/RELEASE.md) | Generator, GitHub release and Zenodo correspondence |
 
 ## License
 
@@ -172,4 +195,4 @@ The code is MIT-licensed. The data in `data/` is licensed under CC BY 4.0. See `
 
 ## Citation
 
-See `CITATION.cff`.
+Cite the [P1A paper](https://arxiv.org/abs/2610.09585) for the method, the software version actually used for the implementation, and the [dataset DOI](https://doi.org/10.5281/zenodo.23197299) for the released corpus. `CITATION.cff` contains the paper citation and candidate software version. The software badge links all versions. The [v1.0.0 software DOI](https://doi.org/10.5281/zenodo.23196765) identifies the earlier release; v1.0.1 will receive its own DOI when archived.

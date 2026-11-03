@@ -1,0 +1,200 @@
+{
+  "description": "Provisional family residual-closure calibration. One family density scale maximizes arrangement-assigned mass subject to a minimum residual fraction; lightship and residual centres are fixed family parameters. No per-seed tuning.",
+  "global": {
+    "profile_name": "family_residual_closure_v4_provisional",
+    "rho_sw_t_m3": 1.025,
+    "weight_model_mode": "family_residual_closure",
+    "total_mass_basis": "reference_loading_displacement",
+    "reference_draft_mode": "fixed_T_D",
+    "compartment_mass_mode": "raw_proxy_absolute",
+    "residual_mass_mode": "closure_to_reference",
+    "lightship_lcg_mode": "fixed",
+    "residual_lcg_mode": "fixed",
+    "trim_limit_L": 0.08,
+    "trim_grid_points": 65,
+    "weight_tolerance_fraction": 1e-06,
+    "lcb_tolerance_L": 0.002,
+    "residual_lcg_L_min": 0.2,
+    "residual_lcg_L_max": 0.8,
+    "deck_occupancy_threshold": 0.1,
+    "deck_central_beam_fraction": 0.9,
+    "deck_station_quantile": 0.25,
+    "deck_end_exclusion_fraction": 0.0,
+    "deck_min_station_breadth_fraction": 0.05,
+    "deck_smoothing_stations": 3,
+    "free_surface_enabled": true,
+    "compartment_scale_limit_quantile": 0.0,
+    "compartment_scale_safety_factor": 0.98,
+    "compartment_fill_factors": {
+      "FUEL_TANKS": 0.98,
+      "BALLAST_TANKS": 0.98,
+      "CARGO": 1.0
+    },
+    "residual_holdout_margin_fraction": 0.03,
+    "calibration_center_mode": "shared_permanent"
+  },
+  "families": {
+    "YACHT": {
+      "reference_T_D": 0.64,
+      "lightship_mass_fraction": 0.5,
+      "minimum_residual_mass_fraction": 0.1,
+      "maximum_residual_mass_fraction": 0.55,
+      "lightship_lcg_L": 0.4328123918935775,
+      "lightship_vcg_D": 0.2,
+      "residual_lcg_L": 0.4328123918935775,
+      "residual_vcg_D": 0.2,
+      "residual_lcg_bounds_L": [
+        0.3,
+        0.65
+      ],
+      "residual_vcg_bounds_D": [
+        0.2,
+        1.1
+      ],
+      "gm_target_m": 2.5,
+      "gm_band_m": [
+        0.5,
+        5.0
+      ],
+      "minimum_freeboard_m": 0.4,
+      "minimum_freeboard_D": 0.05,
+      "gm_free_surface_allowance_m": 0.93,
+      "compartment_mass_scale": 0.12491782953672761
+    },
+    "OSV": {
+      "reference_T_D": 0.66,
+      "lightship_mass_fraction": 0.45,
+      "minimum_residual_mass_fraction": 0.1,
+      "maximum_residual_mass_fraction": 0.55,
+      "lightship_lcg_L": 0.47220333496526556,
+      "lightship_vcg_D": 0.481,
+      "residual_lcg_L": 0.47220333496526556,
+      "residual_vcg_D": 0.481,
+      "residual_lcg_bounds_L": [
+        0.3,
+        0.7
+      ],
+      "residual_vcg_bounds_D": [
+        0.2,
+        1.1
+      ],
+      "gm_target_m": 2.5,
+      "gm_band_m": [
+        0.5,
+        5.0
+      ],
+      "minimum_freeboard_m": 0.5,
+      "minimum_freeboard_D": 0.05,
+      "gm_free_surface_allowance_m": 1.42,
+      "compartment_mass_scale": 0.09500592158756363
+    },
+    "BULKER": {
+      "reference_T_D": 0.76,
+      "lightship_mass_fraction": 0.35,
+      "minimum_residual_mass_fraction": 0.1,
+      "maximum_residual_mass_fraction": 0.55,
+      "lightship_lcg_L": 0.5270330701761401,
+      "lightship_vcg_D": 0.5624196829649998,
+      "residual_lcg_L": 0.5270330701761401,
+      "residual_vcg_D": 0.5624196829649998,
+      "residual_lcg_bounds_L": [
+        0.3,
+        0.7
+      ],
+      "residual_vcg_bounds_D": [
+        0.2,
+        1.15
+      ],
+      "gm_target_m": 2.5,
+      "gm_band_m": [
+        0.5,
+        6.0
+      ],
+      "minimum_freeboard_m": 0.8,
+      "minimum_freeboard_D": 0.05,
+      "gm_free_surface_allowance_m": 4.23,
+      "compartment_mass_scale": 0.19668117873653182
+    },
+    "TANKER": {
+      "reference_T_D": 0.77,
+      "lightship_mass_fraction": 0.4,
+      "minimum_residual_mass_fraction": 0.1,
+      "maximum_residual_mass_fraction": 0.55,
+      "lightship_lcg_L": 0.5279865606299202,
+      "lightship_vcg_D": 0.3195248426668356,
+      "residual_lcg_L": 0.5279865606299202,
+      "residual_vcg_D": 0.3195248426668356,
+      "residual_lcg_bounds_L": [
+        0.3,
+        0.7
+      ],
+      "residual_vcg_bounds_D": [
+        0.2,
+        1.15
+      ],
+      "gm_target_m": 2.5,
+      "gm_band_m": [
+        0.5,
+        5.0
+      ],
+      "minimum_freeboard_m": 0.8,
+      "minimum_freeboard_D": 0.05,
+      "gm_free_surface_allowance_m": 1.61,
+      "compartment_mass_scale": 0.16978344784060853
+    },
+    "CARGO": {
+      "reference_T_D": 0.74,
+      "lightship_mass_fraction": 0.4,
+      "minimum_residual_mass_fraction": 0.1,
+      "maximum_residual_mass_fraction": 0.55,
+      "lightship_lcg_L": 0.5187680767487945,
+      "lightship_vcg_D": 0.4958814238675935,
+      "residual_lcg_L": 0.5187680767487945,
+      "residual_vcg_D": 0.4958814238675935,
+      "residual_lcg_bounds_L": [
+        0.3,
+        0.7
+      ],
+      "residual_vcg_bounds_D": [
+        0.2,
+        1.15
+      ],
+      "gm_target_m": 2.5,
+      "gm_band_m": [
+        0.5,
+        5.0
+      ],
+      "minimum_freeboard_m": 0.7,
+      "minimum_freeboard_D": 0.05,
+      "gm_free_surface_allowance_m": 4.32,
+      "compartment_mass_scale": 0.16780764669907106
+    },
+    "PATROL": {
+      "reference_T_D": 0.64,
+      "lightship_mass_fraction": 0.5,
+      "minimum_residual_mass_fraction": 0.1,
+      "maximum_residual_mass_fraction": 0.55,
+      "lightship_lcg_L": 0.41720829649061,
+      "lightship_vcg_D": 0.096,
+      "residual_lcg_L": 0.41720829649061,
+      "residual_vcg_D": 0.096,
+      "residual_lcg_bounds_L": [
+        0.25,
+        0.65
+      ],
+      "residual_vcg_bounds_D": [
+        0.08,
+        1.1
+      ],
+      "gm_target_m": 2.5,
+      "gm_band_m": [
+        0.5,
+        5.0
+      ],
+      "minimum_freeboard_m": 0.4,
+      "minimum_freeboard_D": 0.05,
+      "gm_free_surface_allowance_m": 0.36,
+      "compartment_mass_scale": 0.09741091738714451
+    }
+  }
+}

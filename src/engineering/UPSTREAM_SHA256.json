@@ -1,0 +1,22 @@
+{
+  "source": "Paper1A_FinalWritingPackage.zip",
+  "original_p1a_sources": {
+    "_p1a_weight/__init__.py": "c75127b567303a75c2cb211cad1930f8dd56016da0e0d33dd98cd77048e398f1",
+    "_p1a_weight/config.py": "96aca640b775d500fa93e1dc32d78584812025fd07e2d56dcd4a946cec535296",
+    "_p1a_weight/deck_guard.py": "a1cb9e844a81145a3171f535f5568063bbee9e084d19d71779fe575ef0734b7d",
+    "_p1a_weight/free_surface.py": "5d15b4b34fadf3ebff2afe4e3d749c699a3222f18d9c623935ef09697e6aa9f3",
+    "_p1a_weight/hydrostatics.py": "4eb1d34cf16d012effca21b41e009ed39462149bfdf8d8d9ce2629de11ca6cac",
+    "_p1a_weight/models.py": "dd07ce65fffaff312516276d8651be0b6a947398c96f45918c2dde38b6b33c90",
+    "_p1a_weight/solver.py": "b31dbd334ec566ae31c38b9cc7419b3aff56e5971a2f6a2c46c0f2be879421be",
+    "_p1a_weight/weights.py": "1abf702ff13c70b10ebd6e0740bec3de966891be0a512082503a64b0464281c5",
+    "_p1a_adjacency/__init__.py": "df586d97571e27d94e8f75cc97869ca1690521fa854ca7bdf7e5cef21267dc8b",
+    "_p1a_adjacency/core.py": "053be0aee02156ae584dfee0e1d8f168218cb2cf28e28f9f1e50d7baf2e0c648",
+    "calibration/family_residual_closure_v4_production_calibrated_fsm_shared.json": "f4322c1ca7ae6d34bf96acf58e134807ee6d264eb58be738fe49ad99ac9704ab"
+  },
+  "shipspace_ga_commit_checked": "ef38c461f64f44630d9372ab72235a1986e3feb3",
+  "packaged_text_only_updates": {
+    "_p1a_weight/__init__.py": "ed95364b3c99b2eee62eafd09a2b794bcb45b0317844881df3eab5568a60fd03",
+    "_p1a_adjacency/core.py": "bd873a32d96518b6a4057741f694007e989ce4c1343cef606feaeef84baceb2d"
+  },
+  "packaged_text_only_reason": "Generator v1.0 naming in one docstring and one comment; numerical implementation unchanged. Original upstream hashes remain above."
+}

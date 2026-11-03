@@ -1,19 +1,19 @@
 # Dataset and representation guide
 
-The frozen generated corpora associated with this version 1.0 release are archived on Zenodo with the GitHub release. This document describes the release identity and serialized sample schema so the data can be used without reverse-engineering the generator.
+The published 50K synthetic corpus associated with Generator v1.0 has a separate [dataset DOI](https://doi.org/10.5281/zenodo.23197299). This document describes the release identity and serialized sample schema so the data can be used without reverse-engineering the generator.
 
-## Frozen corpora
+## Released data
 
 | Corpus | Number of samples | Family balance | Seed | Role |
 |---|---:|---:|---:|---|
-| Primary generated corpus (`dataset_v1`) | 49,998 | 8,333 × 6 | 42 | Main paper / modelling corpus |
+| Primary generated corpus (`dataset_v1`) | 50K (public corpus name) | Six balanced vessel families | 42 | P1A synthetic corpus |
 | Real-reference corpus | 23 | 6 yacht, 5 OSV, 3 each other family | — | Reconstructed real-GA comparison cases |
 
-The manuscript often refers to the primary corpus as “50,000” for readability. The archived corpus count is exactly **49,998** because it contains 8,333 accepted samples for each of six vessel families. The 23 real-reference graphs are also shipped in this repository under `data/real_ga/`. The primary corpus is archived on Zenodo with this release.
+The public corpus is named **50K**. The default generation request is 8,333 arrangements per family. Exact record and split counts are recorded in the deposited `meta.json`; use that metadata when loading the data. The 23 real-reference graphs are shipped under `data/real_ga/`. This software correction does not replace the dataset or change its split membership.
 
 ## Expected archive layout
 
-Generation (`python generate.py`) writes datasets using the following shard-bundle structure (the Zenodo deposit uses the same layout):
+Generation (`python generate.py`) writes datasets using the following shard-bundle structure (consult the deposit metadata for its exact packaging):
 
 ```text
 dataset_v1/
@@ -86,12 +86,14 @@ The production conditioning contract has 16 dimensions:
 | 0–5 | ship-family one-hot: Bulker, Tanker, Container (`CARGO` in code), OSV, Patrol, Yacht |
 | 6 | normalized `L` |
 | 7 | normalized `B` |
-| 8 | normalized occupied depth |
+| 8 | normalized main-hull depth |
 | 9–15 | seven programme fractions in order: engine, machinery, cargo, stores, accommodation, fuel, ballast |
 
 The production corpus uses `cond_source = achieved`, so indices 9–15 contain **achieved** programme fractions. Sampled and effective programmes are stored separately as metadata, allowing alternative conditioning to be reconstructed later.
 
-LCG and KG are not included in the 16-dimensional production conditioning vector; target and achieved values remain available under `aux_physics`.
+LCG and KG are not included in the 16-dimensional synthetic conditioning vector; targets and achieved generator diagnostics remain available under `aux_physics`. The current source marks this layout as `cond_version=2`. Dimension normalization clips to [0, 1] using L: [51, 280] m, B: [9, 54] m and main-hull D: [6, 36] m.
+
+The legacy real-reference/CC converter uses **18 values**: the same family and dimension fields, LCG and KG at indices 9–10, then the seven programme fractions at 11–17. `validation_constants.parameter_cond_vector()` selects the common 16 fields for comparison. These are two documented formats; this correction does not convert stored graphs.
 
 ## Voxel fields
 
@@ -103,7 +105,9 @@ LCG and KG are not included in the 16-dimensional production conditioning vector
 | `native_grid_shape` | tuple | — | Original grid shape before common-grid mapping |
 | `target_grid_shape` | tuple | — | Stored target tensor shape |
 
-The production main-hull grid is `64 × 32 × 24`; the fixed stored representation is `64 × 32 × 32` to maintain a common tensor including superstructure/padding.
+The production main-hull grid is `64 × 32 × 24`. Superstructure adds native layers at the same physical spacing. The stored `voxel_labels` view is nearest-neighbour resampled to `64 × 32 × 32`; it is not simply padding. The companion's `compact_labels` uses a separate deck encoding and exact decode checks. Equal tensor shapes do not make these encodings interchangeable.
+
+Use native labels, fractional occupancy, physical dimensions and preferably the original main-hull mask for [engineering evaluation](ENGINEERING.md).
 
 ## Functional label IDs
 
@@ -118,7 +122,7 @@ The production main-hull grid is `64 × 32 × 24`; the fixed stored representati
 | 6 | `BALLAST_TANKS` | ballast |
 | 7 | `STEERING_GEAR` | steering gear |
 | 8 | `STORES` | stores |
-| 9 | `NAVIGATION` | legacy label; not assigned in production |
+| 9 | `NAVIGATION` | legacy real-reference label; not assigned in synthetic production |
 | 10 | `EMPTY` | outside the represented hull envelope |
 
 ## Zone-type IDs
@@ -162,7 +166,7 @@ Each graph contains additional scalar and structured metadata. The most importan
 | `deck_tiers` | vertical tier metadata |
 | `mirror_ids` | mirror partner per subdivision node |
 | `zone_sides` | centre/port/starboard designation |
-| `gen_version` | generator version string recorded on each sample |
+| `gen_version` | Generator v1.0 producer label on new outputs; archived labels remain unchanged |
 
 Companions written next to each graph are described at the top of `src/data_generator/companion.py`.
 
@@ -192,5 +196,5 @@ Only load serialized `.pt` / `.npz` files obtained from a trusted source. PyTorc
 - The generated samples are not independent observations of real ships; they inherit the same procedural rules and sampling assumptions.
 - Requested, effective and achieved programme fractions are distinct and should not be silently substituted for one another.
 - The 23 real arrangements are comparison references, not a statistical fleet sample.
-- `NAVIGATION` is a retained legacy class ID but is not actively assigned in production.
+- `NAVIGATION` is a retained real-reference class ID but is not actively assigned in synthetic production. The engineering evaluator accepts labels 0–8 and outside=10; it does not silently relabel real references.
 - `CARGO` is both a functional label and the frozen internal ship-type identifier for the container-vessel family; context distinguishes the two.
