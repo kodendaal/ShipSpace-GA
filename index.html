@@ -90,6 +90,7 @@
   --c-ballast: #3498db;
   --c-steering: #e91e63;
   --c-stores: #8d6e63;
+  --c-navigation: #00bcd4;
   --c-other: #c9d1db;
 
   --sans: "Archivo", "Helvetica Neue", Arial, sans-serif;
@@ -361,17 +362,22 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 }
 
 /* Citation */
-.tabs { display: flex; gap: .25rem; margin: 1.5rem 0 0; border-bottom: 1px solid var(--rule); max-width: 52rem; }
-.tab {
-  font-family: var(--sans); font-size: 0.925rem; font-weight: 580;
-  background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px;
-  padding: .55rem .9rem; color: var(--ink-2); cursor: pointer;
-}
-.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
-.tabpanel { max-width: 52rem; margin-top: 1rem; }
-.tabpanel[hidden] { display: none; }
-@media (min-width: 40rem) { .tabpanel pre { white-space: pre-wrap; overflow-wrap: anywhere; } }
+.cites { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; margin-top: 1.75rem; max-width: 52rem; }
+.cites h3 { margin-bottom: .6rem; }
+@media (min-width: 40rem) { .cites pre { white-space: pre-wrap; overflow-wrap: anywhere; } }
 @media (max-width: 40rem) { .code pre { padding: 2.75rem 1rem 1rem; } .code pre code { font-size: 0.8rem; } }
+
+/* Real-reference figure */
+.refs { margin: 1.75rem 0 2.5rem; }
+.refs-scroll { overflow-x: auto; }
+.refs-grid { display: grid; grid-template-columns: 8.5rem minmax(0, 1fr); gap: 1.25rem; }
+.refs-labels { position: relative; margin: 0; padding: 0; list-style: none; font-family: var(--sans); font-size: 0.85rem; line-height: 1.25; color: var(--ink-2); }
+.refs-labels li { position: absolute; left: 0; right: 0; transform: translateY(-50%); }
+.refs-labels span { display: block; color: var(--ink-3); font-size: 0.78rem; }
+.refs-grid a { display: block; cursor: zoom-in; }
+.refs-grid img { width: 100%; height: auto; }
+.refs figcaption { display: grid; gap: .9rem; margin-top: 1rem; }
+@media (max-width: 48rem) { .refs-grid { width: 52rem; } }
 
 /* Footer */
 footer { margin-top: clamp(4rem, 9vw, 6.5rem); border-top: 1px solid var(--rule); padding: 1.6rem 0 2.4rem; font-family: var(--sans); font-size: 0.875rem; color: var(--ink-2); }
@@ -380,8 +386,7 @@ footer p { margin: 0; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 @media print {
-  .topbar .sections, .links, .copy, .tabs, details.table-view { display: none !important; }
-  .tabpanel[hidden] { display: block; }
+  .topbar .sections, .links, .copy, .motion-toggle, details.table-view { display: none !important; }
 }
 </style>
 </head>
@@ -614,6 +619,39 @@ footer p { margin: 0; }
   <section class="block" id="validation" aria-labelledby="h-validation">
     <div class="wrap">
       <h2 id="h-validation">Validation against real ships</h2>
+      <figure class="refs">
+        <div class="refs-scroll">
+          <div class="refs-grid">
+            <ul class="refs-labels" aria-hidden="true">
+              <li style="top:9.6%">Bulk carrier<span>3 ships</span></li>
+              <li style="top:30%">Container vessel<span>3 ships</span></li>
+              <li style="top:45.9%">Offshore support vessel<span>5 ships</span></li>
+              <li style="top:60.8%">Patrol vessel<span>3 ships</span></li>
+              <li style="top:80.6%">Tanker<span>3 ships</span></li>
+              <li style="top:95.5%">Yacht<span>6 ships</span></li>
+            </ul>
+            <a href="assets/real_references_full.webp" aria-label="Open the real-reference figure at full size">
+              <img src="assets/real_references.webp" width="2400" height="1208" loading="lazy"
+                   alt="The 23 real references as 3D voxel models, each next to its connected-compartment graph. Rows from top to bottom hold three bulk carriers, three container vessels, five offshore support vessels, three patrol vessels, three tankers and six yachts.">
+            </a>
+          </div>
+        </div>
+        <figcaption>
+          <p class="caption">The 23 real references used for validation. Each ship is shown as labelled voxels next to its connected-compartment graph. Cyan marks navigation spaces. Only the real references use this class.</p>
+          <ul class="legend" aria-label="Compartment colours">
+            <li><span class="sw" style="--c: var(--c-engine)"></span>Engine room</li>
+            <li><span class="sw" style="--c: var(--c-machinery)"></span>Machinery</li>
+            <li><span class="sw" style="--c: var(--c-cargo)"></span>Cargo or mission</li>
+            <li><span class="sw" style="--c: var(--c-accommodation)"></span>Accommodation</li>
+            <li><span class="sw" style="--c: var(--c-fuel)"></span>Fuel tanks</li>
+            <li><span class="sw" style="--c: var(--c-ballast)"></span>Ballast tanks</li>
+            <li><span class="sw" style="--c: var(--c-steering)"></span>Steering gear</li>
+            <li><span class="sw" style="--c: var(--c-stores)"></span>Stores</li>
+            <li><span class="sw" style="--c: var(--c-navigation)"></span>Navigation</li>
+            <li><span class="sw" style="--c: var(--c-void)"></span>Void</li>
+          </ul>
+        </figcaption>
+      </figure>
       <div class="validation-grid">
         <div class="prose">
           <p>The validation tool compares a generated dataset with the 23 real references. It runs two comparisons. The first uses every stored spatial graph as generated. The second re-extracts 833 arrangements per family as connected-compartment graphs. This is the same extraction used for the real references.</p>
@@ -712,14 +750,11 @@ g = graphs[0]</code></pre></div>
   <section class="block" id="cite" aria-labelledby="h-cite">
     <div class="wrap">
       <h2 id="h-cite">Citation</h2>
-      <p class="lede">Cite the paper for the method. Add the software and dataset DOIs for the versions you used.</p>
-      <div class="tabs" role="tablist" aria-label="BibTeX entries">
-        <button class="tab" role="tab" id="tab-paper" aria-selected="true" aria-controls="panel-paper">Paper</button>
-        <button class="tab" role="tab" id="tab-software" aria-selected="false" aria-controls="panel-software" tabindex="-1">Software v1.0.1</button>
-        <button class="tab" role="tab" id="tab-dataset" aria-selected="false" aria-controls="panel-dataset" tabindex="-1">Dataset v1.0.0</button>
-      </div>
-      <div class="tabpanel" id="panel-paper" role="tabpanel" aria-labelledby="tab-paper">
-        <div class="code"><pre><code>@misc{odendaal2026shipspace,
+      <p class="lede">Cite the paper for the method. Add the software and dataset entries for the versions you used.</p>
+      <div class="cites">
+        <div>
+          <h3>Paper</h3>
+          <div class="code"><pre><code>@misc{odendaal2026shipspace,
   title         = {Procedural Generation of Conceptual 3D Ship Internal Arrangements for Design-Space Exploration},
   author        = {Odendaal, Kirsten and de Winter, Roy},
   year          = {2026},
@@ -728,9 +763,10 @@ g = graphs[0]</code></pre></div>
   primaryClass  = {cs.CE},
   doi           = {10.48550/arXiv.2610.09585}
 }</code></pre></div>
-      </div>
-      <div class="tabpanel" id="panel-software" role="tabpanel" aria-labelledby="tab-software" hidden>
-        <div class="code"><pre><code>@software{odendaal2026shipspacega,
+        </div>
+        <div>
+          <h3>Software v1.0.1</h3>
+          <div class="code"><pre><code>@software{odendaal2026shipspacega,
   title     = {ShipSpace-GA},
   author    = {Odendaal, Kirsten},
   year      = {2026},
@@ -739,8 +775,10 @@ g = graphs[0]</code></pre></div>
   doi       = {10.5281/zenodo.23913344},
   url       = {https://github.com/kodendaal/ShipSpace-GA/releases/tag/v1.0.1}
 }</code></pre></div>
-      <div class="tabpanel" id="panel-dataset" role="tabpanel" aria-labelledby="tab-dataset" hidden>
-        <div class="code"><pre><code>@dataset{odendaal2026shipspacedataset,
+        </div>
+        <div>
+          <h3>Dataset v1.0.0</h3>
+          <div class="code"><pre><code>@dataset{odendaal2026shipspacedataset,
   title     = {ShipSpace-Dataset: A Procedurally Generated Dataset of 3D Ship Internal Arrangements},
   author    = {Odendaal, Kirsten},
   year      = {2026},
@@ -748,6 +786,7 @@ g = graphs[0]</code></pre></div>
   publisher = {Zenodo},
   doi       = {10.5281/zenodo.23197299}
 }</code></pre></div>
+        </div>
       </div>
     </div>
   </section>
@@ -955,25 +994,6 @@ g = graphs[0]</code></pre></div>
     document.body.removeChild(ta);
   }
 
-  // Tabs
-  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
-  function select(t) {
-    tabs.forEach(function (o) {
-      var on = o === t;
-      o.setAttribute("aria-selected", on ? "true" : "false");
-      o.tabIndex = on ? 0 : -1;
-      document.getElementById(o.getAttribute("aria-controls")).hidden = !on;
-    });
-  }
-  tabs.forEach(function (t, i) {
-    t.addEventListener("click", function () { select(t); });
-    t.addEventListener("keydown", function (e) {
-      var n = null;
-      if (e.key === "ArrowRight") n = tabs[(i + 1) % tabs.length];
-      if (e.key === "ArrowLeft") n = tabs[(i - 1 + tabs.length) % tabs.length];
-      if (n) { e.preventDefault(); select(n); n.focus(); }
-    });
-  });
 })();
 </script>
 </body>
