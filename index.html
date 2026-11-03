@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShipSpace-GA | Procedural generation of conceptual 3D ship internal arrangements</title>
+<meta name="description" content="ShipSpace-GA generates conceptual 3D internal arrangements for six ship types. Paper, 50K synthetic dataset, code, validation against 23 real general arrangements, and citation.">
+<meta name="author" content="Kirsten Odendaal, Roy de Winter">
+<link rel="canonical" href="https://kodendaal.github.io/ShipSpace-GA/">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#12233b">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="ShipSpace-GA: procedural generation of conceptual 3D ship internal arrangements">
+<meta property="og:description" content="A generator and a 50K dataset of 3D ship internal arrangements for six vessel families, compared with 23 real general arrangements.">
+<meta property="og:url" content="https://kodendaal.github.io/ShipSpace-GA/">
+<meta property="og:image" content="https://kodendaal.github.io/ShipSpace-GA/assets/social-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preload" href="assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/source-serif-4.woff2" as="font" type="font/woff2" crossorigin>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "ScholarlyArticle",
+      "headline": "Procedural Generation of Conceptual 3D Ship Internal Arrangements for Design-Space Exploration",
+      "url": "https://arxiv.org/abs/2610.09585",
+      "identifier": "https://doi.org/10.48550/arXiv.2610.09585",
+      "datePublished": "2026",
+      "author": [
+        {"@type": "Person", "name": "Kirsten Odendaal", "sameAs": "https://orcid.org/0000-0002-4522-3828"},
+        {"@type": "Person", "name": "Roy de Winter", "sameAs": "https://orcid.org/0000-0002-0865-4709"}
+      ]
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "ShipSpace-GA",
+      "version": "1.0.1",
+      "codeRepository": "https://github.com/kodendaal/ShipSpace-GA",
+      "identifier": "https://doi.org/10.5281/zenodo.23913344",
+      "programmingLanguage": "Python",
+      "license": "https://opensource.org/licenses/MIT",
+      "author": [
+        {"@type": "Person", "name": "Kirsten Odendaal", "sameAs": "https://orcid.org/0000-0002-4522-3828"},
+        {"@type": "Person", "name": "Roy de Winter", "sameAs": "https://orcid.org/0000-0002-0865-4709"}
+      ]
+    }
+  ]
+}
+</script>
+
+<style>
+@font-face {
+  font-family: "Archivo";
+  src: url("assets/fonts/archivo.woff2") format("woff2-variations"), url("assets/fonts/archivo.woff2") format("woff2");
+  font-weight: 100 900; font-stretch: 62% 125%; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("assets/fonts/source-serif-4.woff2") format("woff2-variations"), url("assets/fonts/source-serif-4.woff2") format("woff2");
+  font-weight: 200 900; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("assets/fonts/jetbrains-mono.woff2") format("woff2-variations"), url("assets/fonts/jetbrains-mono.woff2") format("woff2");
+  font-weight: 100 800; font-style: normal; font-display: swap;
+}
+
+:root {
+  /* Base palette: drawing paper and drafting ink */
+  --paper: #ffffff;
+  --panel: #f1f4f8;
+  --ink: #12233b;
+  --ink-2: #44546a;
+  --ink-3: #5c6b80;
+  --rule: #d3dae4;
+  --accent: #1a619a;
+
+  /* Compartment palette, identical to the paper figures (validation_constants.COMP_PALETTE) */
+  --c-void: #607d8b;
+  --c-engine: #e74c3c;
+  --c-machinery: #e67e22;
+  --c-cargo: #f1c40f;
+  --c-accommodation: #2ecc71;
+  --c-fuel: #9b59b6;
+  --c-ballast: #3498db;
+  --c-steering: #e91e63;
+  --c-stores: #8d6e63;
+  --c-other: #c9d1db;
+
+  --sans: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --wide: 74rem;
+  --text: 40rem;
+  --gutter: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { color-scheme: light; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1.125rem;
+  line-height: 1.62;
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+}
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+a:hover { color: var(--ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+code, pre { font-family: var(--mono); font-size: 0.86em; }
+p { margin: 0 0 1em; }
+
+.wrap { max-width: var(--wide); margin: 0 auto; padding: 0 var(--gutter); }
+.skip { position: absolute; left: -999px; top: 0; background: var(--ink); color: #fff; padding: .5rem 1rem; z-index: 10; font-family: var(--sans); }
+.skip:focus { left: 1rem; top: 1rem; }
+
+/* Top bar */
+.topbar { border-bottom: 1px solid var(--rule); }
+.topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; min-height: 3.5rem; }
+.wordmark { font-family: var(--sans); font-weight: 700; font-stretch: 118%; font-size: 1rem; color: var(--ink); text-decoration: none; letter-spacing: 0.01em; display: inline-flex; align-items: center; gap: .55rem; }
+.wordmark svg { width: 1.1rem; height: 1.1rem; }
+.sections { display: flex; gap: 1.4rem; margin: 0; padding: 0; list-style: none; font-family: var(--sans); font-size: 0.875rem; }
+.sections a { color: var(--ink-2); text-decoration: none; }
+.sections a:hover { color: var(--ink); text-decoration: underline; }
+@media (max-width: 56rem) { .sections { display: none; } }
+
+/* Hero */
+.hero { padding: clamp(2.5rem, 6vw, 4.5rem) 0 0; }
+.hero h1 {
+  font-family: var(--sans);
+  font-weight: 640;
+  font-stretch: 112%;
+  font-size: clamp(2rem, 1.15rem + 3.1vw, 3.45rem);
+  line-height: 1.07;
+  letter-spacing: -0.012em;
+  margin: 0 0 1.75rem;
+  max-width: 21em;
+  text-wrap: balance;
+}
+.byline { font-family: var(--sans); margin: 0 0 2rem; }
+.authors { display: flex; flex-wrap: wrap; gap: .35rem 1.6rem; font-size: 1.125rem; font-weight: 560; margin: 0 0 .35rem; padding: 0; list-style: none; }
+.authors a { color: var(--ink); text-decoration: none; }
+.authors a:hover { text-decoration: underline; }
+.orcid { display: inline-flex; vertical-align: -0.12em; margin-left: .3rem; }
+.orcid svg { width: 1em; height: 1em; }
+.affil { color: var(--ink-2); font-size: 0.975rem; margin: 0; }
+.venue { color: var(--ink-2); font-size: 0.975rem; margin: .15rem 0 0; }
+
+.links { display: flex; flex-wrap: wrap; gap: .6rem; margin: 0 0 clamp(2.25rem, 5vw, 3.25rem); padding: 0; list-style: none; }
+.btn {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-family: var(--sans); font-weight: 580; font-size: 0.95rem;
+  background: var(--ink); color: #fff; text-decoration: none;
+  padding: .62rem 1.05rem .62rem .9rem; border-radius: 4px;
+  border: 1px solid var(--ink);
+  transition: background-color .15s ease;
+}
+.btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn svg { width: 1.05rem; height: 1.05rem; flex: none; }
+.btn.quiet { background: transparent; color: var(--ink); }
+.btn.quiet:hover { background: var(--panel); color: var(--ink); border-color: var(--ink); }
+
+/* Figures and legends */
+figure { margin: 0; }
+.hero-figure { display: grid; grid-template-columns: minmax(0, 52rem) minmax(13rem, 1fr); gap: 1.5rem clamp(2rem, 4vw, 3.5rem); align-items: start; }
+.morph { position: relative; margin-bottom: .75rem; }
+.morph video { display: block; width: 100%; height: auto; background: var(--paper); }
+.morph-labels { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; pointer-events: none; }
+.morph-labels li { position: absolute; transform: translate(-50%, 1px); white-space: nowrap; font-family: var(--sans); font-size: 0.8rem; line-height: 1.2; color: var(--ink-3); }
+.hero-figure figcaption { display: grid; gap: 1.1rem; align-content: start; padding-top: .9rem; border-top: 2px solid var(--ink); }
+.caption { font-size: 0.975rem; color: var(--ink-2); margin: 0; max-width: 46rem; }
+.hero-figure .legend { flex-direction: column; gap: .4rem; }
+.morph-key { display: none; }
+.motion-toggle {
+  justify-self: start; display: inline-flex; align-items: center; gap: .45rem;
+  font-family: var(--sans); font-size: 0.85rem; font-weight: 560; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: .4rem .75rem .4rem .6rem; cursor: pointer;
+}
+.motion-toggle:hover { border-color: var(--ink); }
+.motion-toggle svg { width: .85rem; height: .85rem; fill: currentColor; }
+.motion-toggle .i-play, .motion-toggle.is-paused .i-pause { display: none; }
+.motion-toggle.is-paused .i-play { display: block; }
+@media (max-width: 64rem) {
+  .hero-figure { grid-template-columns: minmax(0, 1fr); }
+  .hero-figure .morph { max-width: 46rem; }
+  .hero-figure .legend { flex-direction: row; gap: .45rem 1.15rem; }
+}
+@media (max-width: 40rem) {
+  .morph-labels { display: none; }
+  .morph { margin-bottom: 0; }
+  .morph-key {
+    display: grid; grid-template-columns: 1fr 1fr; gap: .3rem 1rem; margin: 0; padding: 0; list-style: none;
+    font-family: var(--sans); font-size: 0.8rem; color: var(--ink-2);
+  }
+  .morph-key li:nth-child(even) { text-align: right; }
+}
+.legend { display: flex; flex-wrap: wrap; gap: .45rem 1.15rem; margin: 0; padding: 0; list-style: none; font-family: var(--sans); font-size: 0.85rem; color: var(--ink-2); }
+.legend li { display: inline-flex; align-items: center; gap: .45rem; white-space: nowrap; }
+.sw { width: .8rem; height: .8rem; background: var(--c); flex: none; }
+
+/* Sections */
+section.block { padding: clamp(3rem, 7vw, 5rem) 0 0; }
+h2 {
+  font-family: var(--sans); font-weight: 650; font-stretch: 110%;
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 1.95rem); line-height: 1.15; letter-spacing: -0.005em;
+  margin: 0 0 1.1rem;
+}
+h3 { font-family: var(--sans); font-weight: 620; font-size: 1.075rem; line-height: 1.3; margin: 0 0 .5rem; }
+.prose { max-width: var(--text); }
+.lede { max-width: var(--text); }
+
+/* Overview + principal particulars */
+.overview { display: grid; grid-template-columns: minmax(0, var(--text)) minmax(16rem, 21rem); justify-content: space-between; gap: clamp(2rem, 6vw, 5rem); align-items: start; }
+@media (max-width: 60rem) { .overview { grid-template-columns: minmax(0, 1fr); } .particulars { max-width: 26rem; } }
+.particulars { border: 1px solid var(--ink); font-family: var(--sans); font-size: 0.925rem; }
+.particulars h3 { margin: 0; padding: .55rem .9rem; border-bottom: 1px solid var(--ink); font-size: 0.925rem; font-weight: 640; }
+.particulars dl { margin: 0; display: grid; grid-template-columns: 1fr auto; }
+.particulars dt, .particulars dd { margin: 0; padding: .48rem .9rem; border-top: 1px solid var(--rule); }
+.particulars dt:first-of-type, .particulars dd:first-of-type { border-top: 0; }
+.particulars dt { color: var(--ink-2); }
+.particulars dd { text-align: right; font-weight: 620; font-variant-numeric: tabular-nums; }
+
+/* Families chart */
+.chart { margin-top: 1.75rem; position: relative; }
+.chart .legend { margin-bottom: 1.4rem; }
+.fam { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: .4rem 1.75rem; padding: 1rem 0; border-top: 1px solid var(--rule); }
+.fam-name { font-family: var(--sans); }
+.fam-name strong { display: block; font-weight: 620; font-size: 1rem; line-height: 1.3; }
+.fam-name span { display: block; color: var(--ink-3); font-size: 0.85rem; line-height: 1.45; margin-top: .15rem; }
+.ships { display: grid; gap: 6px; align-content: center; }
+.ship { display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); align-items: center; gap: .5rem; border-radius: 3px; cursor: default; }
+.ship-id { font-family: var(--sans); font-size: 0.75rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.bar { display: flex; gap: 2px; height: 14px; }
+.seg { flex: var(--f) 1 0; background: var(--c); min-width: 1px; }
+.seg:last-child { border-radius: 0 4px 4px 0; }
+.ship:hover .bar, .ship:focus-visible .bar { filter: saturate(1.08); }
+.ship:hover .ship-id, .ship:focus-visible .ship-id, .ship.is-active .ship-id { color: var(--ink); font-weight: 650; }
+.ship:focus-visible { outline-offset: 4px; }
+.axis { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: 1.75rem; border-top: 1px solid var(--rule); padding-top: .45rem; }
+.axis-track { position: relative; height: 1.2rem; margin-left: 2.9rem; font-family: var(--sans); font-size: 0.75rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.axis-track span { position: absolute; top: 0; transform: translateX(-50%); }
+.axis-track span:first-child { transform: none; }
+.axis-track span:last-child { transform: translateX(-100%); }
+@media (max-width: 44rem) {
+  .fam, .axis { grid-template-columns: minmax(0, 1fr); gap: .6rem; }
+  .axis > div:first-child { display: none; }
+}
+.chart-note { font-size: 0.925rem; color: var(--ink-2); margin-top: 1.1rem; max-width: var(--text); }
+
+.tip {
+  position: fixed; z-index: 20; pointer-events: none;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 6px;
+  box-shadow: 0 6px 22px rgba(18, 35, 59, .14);
+  padding: .65rem .8rem .55rem; min-width: 15rem;
+  font-family: var(--sans); font-size: 0.8125rem; line-height: 1.35; color: var(--ink);
+  opacity: 0; visibility: hidden;
+}
+.tip.on { opacity: 1; visibility: visible; }
+.tip-head { font-weight: 650; margin-bottom: .1rem; }
+.tip-sub { color: var(--ink-3); margin-bottom: .45rem; }
+.tip-row { display: grid; grid-template-columns: .7rem 1fr auto; gap: .5rem; align-items: center; padding: .1rem 0; color: var(--ink-2); }
+.tip-row b { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.tip-row.hl { color: var(--ink); font-weight: 650; }
+.tip-row .sw { width: .7rem; height: .7rem; }
+
+details.table-view { margin-top: 1.4rem; font-family: var(--sans); font-size: 0.9rem; }
+details.table-view summary { cursor: pointer; color: var(--accent); width: max-content; }
+.scroll { overflow-x: auto; margin-top: .9rem; }
+
+/* Tables */
+table { border-collapse: collapse; width: 100%; font-family: var(--sans); font-size: 0.9rem; }
+th, td { text-align: left; padding: .5rem .75rem .5rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 640; color: var(--ink); border-bottom: 1px solid var(--ink); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.data-table td, .data-table th { white-space: nowrap; padding-right: 1rem; }
+
+/* Generator stages */
+.stages { list-style: none; margin: 2rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0 1.4rem; counter-reset: stage; }
+.stages li { counter-increment: stage; border-top: 2px solid var(--ink); padding-top: .9rem; }
+.stages li::before {
+  content: counter(stage);
+  display: block; font-family: var(--sans); font-weight: 700; font-stretch: 125%;
+  font-size: 1.6rem; line-height: 1; margin-bottom: .6rem; color: var(--ink);
+}
+.stages p { font-size: 0.95rem; line-height: 1.5; margin: 0 0 .55rem; color: var(--ink-2); }
+.stages code { font-size: 0.78rem; color: var(--ink-3); }
+@media (max-width: 68rem) { .stages { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.75rem 1.4rem; } }
+@media (max-width: 40rem) { .stages { grid-template-columns: 1fr; gap: 1.5rem; } }
+
+/* Sample contents */
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem clamp(2rem, 5vw, 4rem); margin-top: 1.75rem; }
+@media (max-width: 48rem) { .two { grid-template-columns: minmax(0, 1fr); } }
+.fields { margin: 0; border-top: 2px solid var(--ink); }
+.fields > div { display: grid; grid-template-columns: minmax(8.5rem, auto) 1fr; gap: 1rem; padding: .6rem 0; border-bottom: 1px solid var(--rule); }
+.fields dt { font-family: var(--mono); font-size: 0.82rem; color: var(--ink); padding-top: .18rem; }
+.fields dd { margin: 0; font-size: 0.975rem; line-height: 1.5; color: var(--ink-2); }
+.two h3 { margin-bottom: .75rem; }
+
+.validation-grid { display: grid; grid-template-columns: minmax(0, var(--text)) minmax(0, 1fr); gap: 2rem clamp(2rem, 5vw, 4rem); align-items: start; }
+@media (max-width: 60rem) { .validation-grid { grid-template-columns: minmax(0, 1fr); } }
+.measures td:first-child { white-space: nowrap; color: var(--ink); font-weight: 560; }
+.subhead { margin-top: 2.25rem; }
+
+/* Code */
+.steps { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.6rem; margin-top: 1.5rem; max-width: 52rem; }
+.steps p { font-size: 0.975rem; color: var(--ink-2); margin: 0 0 .6rem; }
+.code { position: relative; background: var(--panel); border-radius: 6px; }
+.code pre { margin: 0; padding: 1rem 5.5rem 1rem 1.1rem; overflow-x: auto; line-height: 1.6; color: var(--ink); }
+.copy {
+  position: absolute; top: .55rem; right: .55rem;
+  font-family: var(--sans); font-size: 0.8rem; font-weight: 560;
+  background: var(--paper); color: var(--ink); border: 1px solid var(--rule); border-radius: 4px;
+  padding: .3rem .65rem; cursor: pointer;
+}
+.copy:hover { border-color: var(--ink); }
+
+/* Title block: releases and identifiers */
+.titleblock { margin-top: 1.75rem; border: 2px solid var(--ink); font-family: var(--sans); max-width: 58rem; }
+.tb-top, .tb-foot { display: grid; grid-template-columns: 40% 30% 30%; }
+.tb-top > div { padding: .7rem .9rem; border-right: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+.tb-top > div:last-child { border-right: 0; }
+.tb-label { display: block; font-size: 0.75rem; color: var(--ink-3); line-height: 1.3; }
+.tb-value { display: block; font-size: 1rem; font-weight: 620; line-height: 1.35; margin-top: .15rem; }
+.tb-value.big { font-size: 1.35rem; font-weight: 700; font-stretch: 118%; }
+.titleblock table { font-size: 0.9rem; table-layout: fixed; }
+.titleblock th:not(:last-child), .titleblock td:not(:last-child) { border-right: 1px solid var(--ink); }
+.titleblock th, .titleblock td { padding: .55rem .9rem; border-bottom: 1px solid var(--rule); }
+.titleblock th { border-bottom: 1px solid var(--ink); font-size: 0.8rem; font-weight: 600; color: var(--ink-3); }
+.titleblock tr:last-child td { border-bottom: 0; }
+.titleblock td:first-child { font-weight: 600; color: var(--ink); }
+.titleblock td a { font-variant-numeric: tabular-nums; }
+.tb-foot { border-top: 1px solid var(--ink); }
+.tb-foot > div { padding: .6rem .9rem; border-right: 1px solid var(--ink); }
+.tb-foot > div:last-child { border-right: 0; }
+@media (max-width: 44rem) {
+  .tb-top, .tb-foot { grid-template-columns: 1fr; }
+  .tb-top > div, .tb-foot > div { border-right: 0; }
+  .tb-foot > div + div { border-top: 1px solid var(--rule); }
+  .titleblock table { table-layout: auto; }
+  .titleblock col { width: auto !important; }
+  .titleblock th:nth-child(2), .titleblock td:nth-child(2) { display: none; }
+  .titleblock th:first-child, .titleblock td:first-child { border-right: 1px solid var(--ink); }
+}
+
+/* Citation */
+.tabs { display: flex; gap: .25rem; margin: 1.5rem 0 0; border-bottom: 1px solid var(--rule); max-width: 52rem; }
+.tab {
+  font-family: var(--sans); font-size: 0.925rem; font-weight: 580;
+  background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  padding: .55rem .9rem; color: var(--ink-2); cursor: pointer;
+}
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+.tabpanel { max-width: 52rem; margin-top: 1rem; }
+.tabpanel[hidden] { display: none; }
+@media (min-width: 40rem) { .tabpanel pre { white-space: pre-wrap; overflow-wrap: anywhere; } }
+@media (max-width: 40rem) { .code pre { padding: 2.75rem 1rem 1rem; } .code pre code { font-size: 0.8rem; } }
+
+/* Footer */
+footer { margin-top: clamp(4rem, 9vw, 6.5rem); border-top: 1px solid var(--rule); padding: 1.6rem 0 2.4rem; font-family: var(--sans); font-size: 0.875rem; color: var(--ink-2); }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .75rem 2rem; }
+footer p { margin: 0; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+@media print {
+  .topbar .sections, .links, .copy, .tabs, details.table-view { display: none !important; }
+  .tabpanel[hidden] { display: block; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="wordmark" href="#top" aria-label="ShipSpace-GA, back to top">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="0" y="0" width="7.5" height="7.5" fill="#f1c40f"/><rect x="8.5" y="0" width="7.5" height="7.5" fill="#2ecc71"/><rect x="0" y="8.5" width="7.5" height="7.5" fill="#e74c3c"/><rect x="8.5" y="8.5" width="7.5" height="7.5" fill="#3498db"/></svg>
+      ShipSpace-GA
+    </a>
+    <nav aria-label="Sections">
+      <ul class="sections">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#families">Families</a></li>
+        <li><a href="#generator">Generator</a></li>
+        <li><a href="#data">Data</a></li>
+        <li><a href="#validation">Validation</a></li>
+        <li><a href="#start">Get started</a></li>
+        <li><a href="#cite">Citation</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="hero" id="top">
+    <div class="wrap">
+      <h1>Procedural Generation of Conceptual 3D Ship Internal Arrangements for Design-Space Exploration</h1>
+
+      <div class="byline">
+        <ul class="authors">
+          <li><a href="https://kodendaal.github.io/">Kirsten Odendaal</a><a class="orcid" href="https://orcid.org/0000-0002-4522-3828" aria-label="ORCID of Kirsten Odendaal"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="8" fill="#a6ce39"/><rect x="4.6" y="6.6" width="1.2" height="5" fill="#fff"/><circle cx="5.2" cy="4.9" r=".8" fill="#fff"/><path d="M7.4 6.6h1.9c1.9 0 2.8 1.2 2.8 2.5 0 1.4-1 2.5-2.8 2.5H7.4zm1.2 1v3h.7c1.2 0 1.7-.7 1.7-1.5 0-.9-.6-1.5-1.7-1.5z" fill="#fff"/></svg></a></li>
+          <li><span>Roy de Winter</span><a class="orcid" href="https://orcid.org/0000-0002-0865-4709" aria-label="ORCID of Roy de Winter"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="8" fill="#a6ce39"/><rect x="4.6" y="6.6" width="1.2" height="5" fill="#fff"/><circle cx="5.2" cy="4.9" r=".8" fill="#fff"/><path d="M7.4 6.6h1.9c1.9 0 2.8 1.2 2.8 2.5 0 1.4-1 2.5-2.8 2.5H7.4zm1.2 1v3h.7c1.2 0 1.7-.7 1.7-1.5 0-.9-.6-1.5-1.7-1.5z" fill="#fff"/></svg></a></li>
+        </ul>
+        <p class="affil">Department of Maritime and Transport Technology, Delft University of Technology</p>
+        <p class="venue">Preprint on arXiv, 2026</p>
+      </div>
+
+      <ul class="links">
+        <li><a class="btn" href="https://arxiv.org/abs/2610.09585">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M5 2.5h7l3.5 3.5v11.5H5z"/><path d="M12 2.5V6h3.5M7.8 10h5.4M7.8 13h5.4"/></svg>
+          Paper</a></li>
+        <li><a class="btn" href="https://doi.org/10.5281/zenodo.23197299">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><ellipse cx="10" cy="4.8" rx="6" ry="2.3"/><path d="M4 4.8v10.4c0 1.3 2.7 2.3 6 2.3s6-1 6-2.3V4.8M4 10c0 1.3 2.7 2.3 6 2.3s6-1 6-2.3"/></svg>
+          Dataset</a></li>
+        <li><a class="btn" href="https://github.com/kodendaal/ShipSpace-GA">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          Code</a></li>
+        <li><a class="btn quiet" href="https://github.com/kodendaal/ShipSpace-GA/tree/main/docs">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M10 5.2C8.4 3.9 6 3.5 3 3.6v11.6c3 0 5.4.4 7 1.7 1.6-1.3 4-1.7 7-1.7V3.6c-3-.1-5.4.3-7 1.6zM10 5.2v11.7"/></svg>
+          Documentation</a></li>
+        <li><a class="btn quiet" href="#cite">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M3 11.2C3 7.4 4.9 5 8 4.2l.5 1.4c-1.7.7-2.6 1.9-2.7 3.5H8.5V15H3zm8.5 0c0-3.8 1.9-6.2 5-7l.5 1.4c-1.7.7-2.6 1.9-2.7 3.5H17V15h-5.5z"/></svg>
+          Cite</a></li>
+      </ul>
+
+      <figure class="hero-figure">
+        <div class="morph">
+          <video id="morph" muted loop playsinline preload="auto" width="1540" height="1426"
+                 poster="assets/morph_poster.webp" aria-describedby="morph-cap">
+            <source src="assets/morph_2x3.mp4" type="video/mp4">
+            <source src="assets/morph_2x3.webm" type="video/webm; codecs=av01.0.08M.08">
+          </video>
+          <ul class="morph-labels" aria-hidden="true">
+            <li style="left:25.2%;top:32.3%">Offshore support vessel</li>
+            <li style="left:74.8%;top:32.3%">Bulk carrier</li>
+            <li style="left:25.2%;top:64.9%">Patrol vessel</li>
+            <li style="left:74.8%;top:64.9%">Tanker</li>
+            <li style="left:25.2%;top:97.8%">Motor yacht</li>
+            <li style="left:74.8%;top:97.8%">Container vessel</li>
+          </ul>
+        </div>
+        <figcaption>
+          <p class="caption" id="morph-cap">Six generated arrangements, one per vessel family. The voxels collapse into the zone graph. Zones of the same function then merge into the connected-compartment graph. The loop then runs back to the voxels.</p>
+          <ul class="morph-key" aria-label="Position of each vessel family in the animation">
+            <li>Offshore support vessel</li><li>Bulk carrier</li>
+            <li>Patrol vessel</li><li>Tanker</li>
+            <li>Motor yacht</li><li>Container vessel</li>
+          </ul>
+          <ul class="legend" aria-label="Compartment colours">
+            <li><span class="sw" style="--c: var(--c-engine)"></span>Engine room</li>
+            <li><span class="sw" style="--c: var(--c-machinery)"></span>Machinery</li>
+            <li><span class="sw" style="--c: var(--c-cargo)"></span>Cargo or mission</li>
+            <li><span class="sw" style="--c: var(--c-accommodation)"></span>Accommodation</li>
+            <li><span class="sw" style="--c: var(--c-fuel)"></span>Fuel tanks</li>
+            <li><span class="sw" style="--c: var(--c-ballast)"></span>Ballast tanks</li>
+            <li><span class="sw" style="--c: var(--c-steering)"></span>Steering gear</li>
+            <li><span class="sw" style="--c: var(--c-stores)"></span>Stores</li>
+            <li><span class="sw" style="--c: var(--c-void)"></span>Void</li>
+          </ul>
+          <button class="motion-toggle" id="motion-toggle" type="button" aria-controls="morph" hidden>
+            <svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx=".6"/><rect x="9.5" y="2.5" width="3" height="11" rx=".6"/></svg>
+            <svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.6v10.8c0 .5.5.8.9.5l8.2-5.4c.4-.3.4-.8 0-1L5.4 2.1c-.4-.3-.9 0-.9.5z"/></svg>
+            <span>Pause animation</span>
+          </button>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <section class="block" id="overview" aria-labelledby="h-overview">
+    <div class="wrap overview">
+      <div class="prose">
+        <h2 id="h-overview">Overview</h2>
+        <p>ShipSpace-GA generates conceptual 3D internal arrangements of ships. It places functional compartments inside a hull for six vessel families. Each layout starts from a sampled brief of main dimensions and compartment volumes.</p>
+        <p>Every arrangement is stored as a voxel grid and as a graph. Each zone of the ship becomes a node labelled with its compartment. Zones that touch are joined by edges.</p>
+        <p>We release 50K synthetic arrangements with fixed train, validation and test splits. We compare them with 23 general arrangements reconstructed from real ships. The repository holds the generator, the validation tools and an engineering evaluator.</p>
+      </div>
+      <aside class="particulars" aria-labelledby="h-particulars">
+        <h3 id="h-particulars">Principal particulars</h3>
+        <dl>
+          <dt>Synthetic arrangements</dt><dd>50K</dd>
+          <dt>Vessel families</dt><dd>6</dd>
+          <dt>Real references</dt><dd>23</dd>
+          <dt>Hull templates</dt><dd>17</dd>
+          <dt>Voxel grid</dt><dd>64 × 32 × 32</dd>
+          <dt>Compartment classes</dt><dd>9</dd>
+          <dt>Train, val, test</dt><dd>80 / 10 / 10 %</dd>
+          <dt>Generator</dt><dd>v1.0</dd>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <section class="block" id="families" aria-labelledby="h-families">
+    <div class="wrap">
+      <h2 id="h-families">Six vessel families</h2>
+      <p class="lede">Each family has its own range of dimensions and its own functional programme. The bars show the programme of the 23 reconstructed real ships. Each bar is one ship, split by share of internal volume. Hover over or tap a bar to read its values.</p>
+
+      <div class="chart" id="chart">
+        <ul class="legend" id="chart-legend" aria-label="Programme colours"></ul>
+        <div id="chart-rows"></div>
+        <div class="axis" aria-hidden="true"><div></div><div class="axis-track"><span style="left:0">0%</span><span style="left:25%">25%</span><span style="left:50%">50%</span><span style="left:75%">75%</span><span style="left:100%">100%</span></div></div>
+        <div class="tip" id="tip" role="status" aria-live="polite"></div>
+      </div>
+      <p class="chart-note">Lengths are the ranges the generator samples. The meaning of cargo or mission space depends on the family. The grey remainder holds void, steering gear and any other space. Ship identifiers follow <a href="https://github.com/kodendaal/ShipSpace-GA/blob/main/docs/PROVENANCE.md">the provenance record</a>.</p>
+
+      <details class="table-view">
+        <summary>Show the data as a table</summary>
+        <div class="scroll">
+          <table class="data-table">
+            <caption class="sr-only">Functional programme of the 23 real references, percent of internal volume</caption>
+            <thead><tr><th>ID</th><th>Ship</th><th class="num">Length (m)</th><th class="num">Cargo</th><th class="num">Fuel</th><th class="num">Accom.</th><th class="num">Engine</th><th class="num">Ballast</th><th class="num">Machinery</th><th class="num">Stores</th><th class="num">Other</th></tr></thead>
+            <tbody>
+              <tr><td>B01</td><td>Nordic London</td><td class="num">237</td><td class="num">57.9</td><td class="num">5.4</td><td class="num">6.3</td><td class="num">6.2</td><td class="num">15.6</td><td class="num">2.0</td><td class="num">2.9</td><td class="num">3.7</td></tr>
+              <tr><td>B02</td><td>Nanjing Confidence</td><td class="num">180</td><td class="num">57.5</td><td class="num">6.6</td><td class="num">4.6</td><td class="num">7.0</td><td class="num">18.7</td><td class="num">1.5</td><td class="num">1.3</td><td class="num">2.9</td></tr>
+              <tr><td>B03</td><td>Oshima open bulk carrier</td><td class="num">199</td><td class="num">55.1</td><td class="num">6.1</td><td class="num">6.1</td><td class="num">6.7</td><td class="num">17.1</td><td class="num">2.3</td><td class="num">1.4</td><td class="num">5.2</td></tr>
+              <tr><td>T01</td><td>Besiktas product tanker</td><td class="num">135</td><td class="num">53.3</td><td class="num">4.4</td><td class="num">4.3</td><td class="num">6.3</td><td class="num">13.1</td><td class="num">7.5</td><td class="num">4.6</td><td class="num">6.5</td></tr>
+              <tr><td>T02</td><td>Zumrut Ana</td><td class="num">87</td><td class="num">48.6</td><td class="num">3.6</td><td class="num">13.7</td><td class="num">7.5</td><td class="num">14.8</td><td class="num">3.3</td><td class="num">3.8</td><td class="num">4.8</td></tr>
+              <tr><td>T03</td><td>Seriana / Stellata</td><td class="num">119</td><td class="num">48.9</td><td class="num">4.5</td><td class="num">8.5</td><td class="num">7.8</td><td class="num">18.9</td><td class="num">5.9</td><td class="num">3.6</td><td class="num">1.9</td></tr>
+              <tr><td>C01</td><td>DSME 4,600 TEU containership</td><td class="num">264</td><td class="num">67.6</td><td class="num">4.7</td><td class="num">4.0</td><td class="num">4.4</td><td class="num">9.9</td><td class="num">2.0</td><td class="num">1.3</td><td class="num">6.1</td></tr>
+              <tr><td>C02</td><td>Leonidio</td><td class="num">242</td><td class="num">62.2</td><td class="num">2.9</td><td class="num">4.6</td><td class="num">6.2</td><td class="num">12.2</td><td class="num">3.2</td><td class="num">1.8</td><td class="num">6.7</td></tr>
+              <tr><td>C03</td><td>Gdynia Type 8234 containership</td><td class="num">286</td><td class="num">66.1</td><td class="num">5.6</td><td class="num">4.8</td><td class="num">3.9</td><td class="num">11.2</td><td class="num">2.5</td><td class="num">2.1</td><td class="num">3.7</td></tr>
+              <tr><td>O01</td><td>Centurión</td><td class="num">71</td><td class="num">20.4</td><td class="num">11.5</td><td class="num">20.3</td><td class="num">7.8</td><td class="num">11.8</td><td class="num">9.2</td><td class="num">4.6</td><td class="num">14.5</td></tr>
+              <tr><td>O02</td><td>MMA Leeuwin</td><td class="num">82</td><td class="num">35.3</td><td class="num">5.2</td><td class="num">25.8</td><td class="num">6.1</td><td class="num">11.5</td><td class="num">7.9</td><td class="num">3.5</td><td class="num">4.7</td></tr>
+              <tr><td>O03</td><td>MMA Pride</td><td class="num">78</td><td class="num">20.1</td><td class="num">5.1</td><td class="num">24.5</td><td class="num">10.1</td><td class="num">16.8</td><td class="num">9.8</td><td class="num">4.7</td><td class="num">8.9</td></tr>
+              <tr><td>O04</td><td>MMA Pinnacle</td><td class="num">88</td><td class="num">34.4</td><td class="num">5.1</td><td class="num">26.0</td><td class="num">6.5</td><td class="num">14.1</td><td class="num">5.9</td><td class="num">3.1</td><td class="num">4.9</td></tr>
+              <tr><td>O05</td><td>Skandi Responder</td><td class="num">82</td><td class="num">39.5</td><td class="num">5.3</td><td class="num">22.4</td><td class="num">4.1</td><td class="num">11.5</td><td class="num">3.8</td><td class="num">3.9</td><td class="num">9.6</td></tr>
+              <tr><td>P01</td><td>Austal Offshore Patrol 60</td><td class="num">70</td><td class="num">4.1</td><td class="num">3.9</td><td class="num">31.9</td><td class="num">9.4</td><td class="num">5.1</td><td class="num">17.6</td><td class="num">15.2</td><td class="num">12.7</td></tr>
+              <tr><td>P02</td><td>Austal Patrol 40</td><td class="num">60</td><td class="num">4.5</td><td class="num">3.9</td><td class="num">32.8</td><td class="num">10.7</td><td class="num">7.1</td><td class="num">20.7</td><td class="num">9.2</td><td class="num">11.1</td></tr>
+              <tr><td>P03</td><td>Austal Patrol 58</td><td class="num">60</td><td class="num">4.3</td><td class="num">6.4</td><td class="num">31.3</td><td class="num">8.6</td><td class="num">4.8</td><td class="num">19.3</td><td class="num">14.8</td><td class="num">10.5</td></tr>
+              <tr><td>Y01</td><td>Boardwalk</td><td class="num">76</td><td class="num">12.3</td><td class="num">3.5</td><td class="num">40.2</td><td class="num">9.3</td><td class="num">7.1</td><td class="num">12.6</td><td class="num">4.3</td><td class="num">10.8</td></tr>
+              <tr><td>Y02</td><td>Deep Blue</td><td class="num">55</td><td class="num">19.5</td><td class="num">2.8</td><td class="num">35.5</td><td class="num">7.3</td><td class="num">2.0</td><td class="num">11.5</td><td class="num">10.4</td><td class="num">11.0</td></tr>
+              <tr><td>Y03</td><td>O&#39;Ptasia</td><td class="num">84</td><td class="num">16.2</td><td class="num">5.4</td><td class="num">36.2</td><td class="num">6.2</td><td class="num">7.9</td><td class="num">12.5</td><td class="num">9.3</td><td class="num">6.3</td></tr>
+              <tr><td>Y04</td><td>Quattroelle</td><td class="num">88</td><td class="num">16.1</td><td class="num">5.8</td><td class="num">36.7</td><td class="num">9.2</td><td class="num">6.3</td><td class="num">13.2</td><td class="num">5.6</td><td class="num">7.1</td></tr>
+              <tr><td>Y05</td><td>Seven Seas</td><td class="num">110</td><td class="num">18.8</td><td class="num">3.8</td><td class="num">39.3</td><td class="num">9.2</td><td class="num">6.9</td><td class="num">9.7</td><td class="num">6.6</td><td class="num">5.8</td></tr>
+              <tr><td>Y06</td><td>Sophia</td><td class="num">101</td><td class="num">17.8</td><td class="num">4.2</td><td class="num">35.2</td><td class="num">10.3</td><td class="num">6.8</td><td class="num">11.4</td><td class="num">8.2</td><td class="num">6.0</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section class="block" id="generator" aria-labelledby="h-generator">
+    <div class="wrap">
+      <h2 id="h-generator">How the generator works</h2>
+      <p class="lede">Generation runs in six stages. A sample enters the corpus only after it passes the production quality checks.</p>
+      <ol class="stages">
+        <li><h3>Sample the brief</h3><p>Draws the ship type, the main dimensions and the compartment volume budgets.</p><code>ship_params.py</code></li>
+        <li><h3>Fit the hull</h3><p>Picks a hull template for the family and scales it to the sampled size. A superstructure is added on deck.</p><code>hull_mask.py</code></li>
+        <li><h3>Subdivide</h3><p>Bulkheads, decks and side zones split the hull into zones.</p><code>bulkhead_placement.py</code></li>
+        <li><h3>Assign functions</h3><p>Gives every zone a compartment. A greedy fill comes first. Repair passes and an LCG/KG optimisation follow.</p><code>compartment_assignment.py</code></li>
+        <li><h3>Encode</h3><p>Builds the zone graph and the 64 × 32 × 32 voxel grid.</p><code>graph_builder.py</code></li>
+        <li><h3>Check and package</h3><p>Runs the quality checks. Accepted samples go into train, validation and test shards.</p><code>dataset_builder.py</code></li>
+      </ol>
+      <p class="chart-note">Parameter ranges, zone eligibility and the assignment rules are in <a href="https://github.com/kodendaal/ShipSpace-GA/blob/main/docs/GENERATOR.md">the generator specification</a>. The acceptance checks are in <a href="https://github.com/kodendaal/ShipSpace-GA/blob/main/docs/QC.md">the QC summary</a>.</p>
+    </div>
+  </section>
+
+  <section class="block" id="data" aria-labelledby="h-data">
+    <div class="wrap">
+      <h2 id="h-data">What each sample contains</h2>
+      <p class="lede">Each sample is a PyTorch Geometric graph with voxel fields attached. Shards hold up to 500 graphs each.</p>
+      <div class="two">
+        <div>
+          <h3>Graph</h3>
+          <dl class="fields">
+            <div><dt>x</dt><dd>19 geometric features per zone</dd></div>
+            <div><dt>y</dt><dd>Compartment class per zone</dd></div>
+            <div><dt>edge_index</dt><dd>Zones that touch, stored in both directions</dd></div>
+            <div><dt>edge_attr</dt><dd>7 features per edge for the centroid offset and the edge type</dd></div>
+            <div><dt>cond</dt><dd>16 conditioning values for ship type, main dimensions and programme</dd></div>
+          </dl>
+        </div>
+        <div>
+          <h3>Voxel grid</h3>
+          <dl class="fields">
+            <div><dt>voxel_labels</dt><dd>Compartment class per cell on a 64 × 32 × 32 grid</dd></div>
+            <div><dt>voxel_hull_mask</dt><dd>Occupied envelope of the ship</dd></div>
+            <div><dt>zone_node_mask</dt><dd>Graph node that owns each cell</dd></div>
+            <div><dt>companion</dt><dd>Compact record per sample, loaded on request</dd></div>
+          </dl>
+        </div>
+      </div>
+      <p class="chart-note">Field layouts, class IDs and metadata are in <a href="https://github.com/kodendaal/ShipSpace-GA/blob/main/docs/DATASET.md">the dataset guide</a>.</p>
+    </div>
+  </section>
+
+  <section class="block" id="validation" aria-labelledby="h-validation">
+    <div class="wrap">
+      <h2 id="h-validation">Validation against real ships</h2>
+      <div class="validation-grid">
+        <div class="prose">
+          <p>The validation tool compares a synthetic corpus with the 23 reconstructed real arrangements. It runs two comparisons. The first uses every stored graph as generated. The second re-extracts 833 graphs per family as connected regions of equal function. This is the same extraction used for the real ships.</p>
+          <p>Results for the published corpus are in <a href="https://arxiv.org/abs/2610.09585">the paper</a>.</p>
+
+          <h3 class="subhead">Engineering evaluator</h3>
+          <p>A separate evaluator computes calibrated whole-ship quantities for existing arrangements. It returns LCG, KG and an adjacency cost. It can also solve the equilibrium trim and a GM corrected for free surface. See <a href="https://github.com/kodendaal/ShipSpace-GA/blob/main/docs/ENGINEERING.md">the engineering guide</a>.</p>
+
+          <h3 class="subhead">Scope</h3>
+          <p>Every released sample passes the production checks of the generator. These checks enforce the encoded early-stage design rules. Each sample is a conceptual layout for design-space exploration.</p>
+        </div>
+        <div>
+          <table class="measures">
+            <caption class="sr-only">Similarity measures reported by the validation tool</caption>
+            <thead><tr><th scope="col">Measure</th><th scope="col">What it compares</th></tr></thead>
+            <tbody>
+              <tr><td>Label JSD</td><td>How often each compartment class appears</td></tr>
+              <tr><td>KS tests</td><td>Zone and edge counts, LCG, KG, GM and programme fractions</td></tr>
+              <tr><td>MMD</td><td>Graph structure through degree and clustering distributions</td></tr>
+              <tr><td>Adjacency</td><td>Which compartment classes touch</td></tr>
+              <tr><td>Centroid KS</td><td>Where each compartment class sits in the ship</td></tr>
+              <tr><td>Coverage</td><td>Share of real ships with a close synthetic neighbour in design-parameter space</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="start" aria-labelledby="h-start">
+    <div class="wrap">
+      <h2 id="h-start">Get started</h2>
+      <div class="steps">
+        <div>
+          <h3>Install</h3>
+          <p>Python 3.10 or newer.</p>
+          <div class="code"><pre><code>git clone https://github.com/kodendaal/ShipSpace-GA.git
+cd ShipSpace-GA
+pip install -r requirements.txt</code></pre></div>
+        </div>
+        <div>
+          <h3>Generate a small corpus</h3>
+          <p>Ten arrangements per family, written to <code>data/test_run</code>.</p>
+          <div class="code"><pre><code>python generate.py --out data/test_run --per-type 10 --workers 6</code></pre></div>
+        </div>
+        <div>
+          <h3>Compare with the real ships</h3>
+          <p>Writes metrics, per-family reports and comparison figures. The full 50K corpus needs about 10 GB of RAM.</p>
+          <div class="code"><pre><code>python validate.py --dataset data/test_run --out validation_test --per-type 10</code></pre></div>
+        </div>
+        <div>
+          <h3>Load the published corpus</h3>
+          <p>Download the corpus from <a href="https://doi.org/10.5281/zenodo.23197299">Zenodo</a> and place it at <code>data/dataset_v1</code>.</p>
+          <div class="code"><pre><code>import sys
+sys.path.insert(0, "src/data_generator")
+from dataset_builder import load_split
+
+graphs = load_split("data/dataset_v1", "train")
+g = graphs[0]</code></pre></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="releases" aria-labelledby="h-releases">
+    <div class="wrap">
+      <h2 id="h-releases">Releases and identifiers</h2>
+      <p class="lede">Software and dataset have separate version records on Zenodo. Cite the versions you used.</p>
+      <div class="titleblock">
+        <div class="tb-top">
+          <div><span class="tb-label">Project</span><span class="tb-value big">ShipSpace-GA</span></div>
+          <div><span class="tb-label">Authors</span><span class="tb-value">K. Odendaal, R. de Winter</span></div>
+          <div><span class="tb-label">Institution</span><span class="tb-value">TU Delft</span></div>
+        </div>
+        <table>
+          <caption class="sr-only">Archived records and their identifiers</caption>
+          <colgroup><col style="width:40%"><col style="width:30%"><col style="width:30%"></colgroup>
+          <thead><tr><th scope="col">Record</th><th scope="col">Version</th><th scope="col">Identifier</th></tr></thead>
+          <tbody>
+            <tr><td>Paper</td><td>arXiv</td><td><a href="https://doi.org/10.48550/arXiv.2610.09585">10.48550/arXiv.2610.09585</a></td></tr>
+            <tr><td>Dataset</td><td>1.0.0</td><td><a href="https://doi.org/10.5281/zenodo.23197299">10.5281/zenodo.23197299</a></td></tr>
+            <tr><td>Software</td><td>1.0.1</td><td><a href="https://doi.org/10.5281/zenodo.23913344">10.5281/zenodo.23913344</a></td></tr>
+            <tr><td>Software</td><td>1.0.0</td><td><a href="https://doi.org/10.5281/zenodo.23196765">10.5281/zenodo.23196765</a></td></tr>
+            <tr><td>Software, all versions</td><td>Concept</td><td><a href="https://doi.org/10.5281/zenodo.23196764">10.5281/zenodo.23196764</a></td></tr>
+            <tr><td>Dataset, all versions</td><td>Concept</td><td><a href="https://doi.org/10.5281/zenodo.23197298">10.5281/zenodo.23197298</a></td></tr>
+          </tbody>
+        </table>
+        <div class="tb-foot">
+          <div><span class="tb-label">Code licence</span><span class="tb-value">MIT</span></div>
+          <div><span class="tb-label">Data licence</span><span class="tb-value">CC BY 4.0</span></div>
+          <div><span class="tb-label">Latest software release</span><span class="tb-value">3 November 2026</span></div>
+        </div>
+      </div>
+      <p class="chart-note">How the GitHub tags, Zenodo records and paper relate is set out in <a href="https://github.com/kodendaal/ShipSpace-GA/blob/main/docs/RELEASE.md">the release record</a>.</p>
+    </div>
+  </section>
+
+  <section class="block" id="cite" aria-labelledby="h-cite">
+    <div class="wrap">
+      <h2 id="h-cite">Citation</h2>
+      <p class="lede">Cite the paper for the method. Add the software and dataset DOIs for the versions you used. The dataset BibTeX is on <a href="https://doi.org/10.5281/zenodo.23197299">its Zenodo record</a>.</p>
+      <div class="tabs" role="tablist" aria-label="BibTeX entries">
+        <button class="tab" role="tab" id="tab-paper" aria-selected="true" aria-controls="panel-paper">Paper</button>
+        <button class="tab" role="tab" id="tab-software" aria-selected="false" aria-controls="panel-software" tabindex="-1">Software v1.0.1</button>
+      </div>
+      <div class="tabpanel" id="panel-paper" role="tabpanel" aria-labelledby="tab-paper">
+        <div class="code"><pre><code>@misc{odendaal2026shipspace,
+  title         = {Procedural Generation of Conceptual 3D Ship Internal Arrangements for Design-Space Exploration},
+  author        = {Odendaal, Kirsten and de Winter, Roy},
+  year          = {2026},
+  eprint        = {2610.09585},
+  archivePrefix = {arXiv},
+  doi           = {10.48550/arXiv.2610.09585},
+  url           = {https://arxiv.org/abs/2610.09585}
+}</code></pre></div>
+      </div>
+      <div class="tabpanel" id="panel-software" role="tabpanel" aria-labelledby="tab-software" hidden>
+        <div class="code"><pre><code>@software{odendaal2026shipspacega,
+  title     = {ShipSpace-GA},
+  author    = {Odendaal, Kirsten and de Winter, Roy},
+  year      = {2026},
+  version   = {1.0.1},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.23913344},
+  url       = {https://github.com/kodendaal/ShipSpace-GA}
+}</code></pre></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>ShipSpace-GA by <a href="https://kodendaal.github.io/">Kirsten Odendaal</a> and Roy de Winter, Delft University of Technology.</p>
+    <p>Code under MIT. Data under CC BY 4.0.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // Programme classes in drawing order. Order chosen so neighbouring colours stay distinct.
+  var CLASSES = [
+    { key: "cargo",         label: "Cargo or mission", c: "var(--c-cargo)" },
+    { key: "fuel",          label: "Fuel tanks",       c: "var(--c-fuel)" },
+    { key: "accommodation", label: "Accommodation",    c: "var(--c-accommodation)" },
+    { key: "engine",        label: "Engine room",      c: "var(--c-engine)" },
+    { key: "ballast",       label: "Ballast tanks",    c: "var(--c-ballast)" },
+    { key: "machinery",     label: "Machinery",        c: "var(--c-machinery)" },
+    { key: "stores",        label: "Stores",           c: "var(--c-stores)" },
+    { key: "other",         label: "Void and other",   c: "var(--c-other)" }
+  ];
+
+  var FAMILIES = [
+    { key: "bulker",    name: "Bulk carrier",            L: "150–280 m" },
+    { key: "tanker",    name: "Tanker",                  L: "75–150 m" },
+    { key: "container", name: "Container vessel",        L: "230–300 m" },
+    { key: "osv",       name: "Offshore support vessel", L: "50–95 m" },
+    { key: "patrol",    name: "Patrol vessel",           L: "55–85 m" },
+    { key: "yacht",     name: "Motor yacht",             L: "50–100 m" }
+  ];
+
+  // Programme fractions of the 23 real references (data/real_ga/real_ga_meta.json, budget_fracs).
+  // p = [cargo, fuel, accommodation, engine, ballast, machinery, stores]
+  var SHIPS = [{"id":"B01","fam":"bulker","name":"Nordic London","L":237,"p":[0.579,0.0542,0.0633,0.0623,0.1559,0.0199,0.0289]},{"id":"B02","fam":"bulker","name":"Nanjing Confidence","L":180,"p":[0.5752,0.066,0.0457,0.0696,0.1872,0.0148,0.0129]},{"id":"B03","fam":"bulker","name":"Oshima open bulk carrier","L":199,"p":[0.5512,0.0607,0.0614,0.0669,0.1706,0.0232,0.0136]},{"id":"T01","fam":"tanker","name":"Besiktas product tanker","L":135,"p":[0.533,0.044,0.0427,0.0634,0.131,0.075,0.0464]},{"id":"T02","fam":"tanker","name":"Zumrut Ana","L":87,"p":[0.4859,0.0361,0.1366,0.0748,0.1481,0.033,0.0375]},{"id":"T03","fam":"tanker","name":"Seriana / Stellata","L":119,"p":[0.4887,0.0455,0.0846,0.0785,0.1891,0.0589,0.0358]},{"id":"C01","fam":"container","name":"DSME 4,600 TEU containership","L":264,"p":[0.6756,0.0474,0.0402,0.0441,0.0992,0.0197,0.0128]},{"id":"C02","fam":"container","name":"Leonidio","L":242,"p":[0.622,0.0295,0.0461,0.0624,0.1223,0.0325,0.018]},{"id":"C03","fam":"container","name":"Gdynia Type 8234 containership","L":286,"p":[0.6609,0.0563,0.0475,0.0392,0.1122,0.025,0.0215]},{"id":"O01","fam":"osv","name":"Centurión","L":71,"p":[0.2043,0.1145,0.2031,0.0778,0.1178,0.0923,0.0456]},{"id":"O02","fam":"osv","name":"MMA Leeuwin","L":82,"p":[0.353,0.0522,0.2577,0.0606,0.115,0.0788,0.0354]},{"id":"O03","fam":"osv","name":"MMA Pride","L":78,"p":[0.2014,0.0512,0.2451,0.1011,0.1677,0.0977,0.0472]},{"id":"O04","fam":"osv","name":"MMA Pinnacle","L":88,"p":[0.3445,0.0508,0.2599,0.0651,0.1409,0.0591,0.0308]},{"id":"O05","fam":"osv","name":"Skandi Responder","L":82,"p":[0.3952,0.0535,0.2242,0.0409,0.1145,0.0376,0.0386]},{"id":"P01","fam":"patrol","name":"Austal Offshore Patrol 60","L":70,"p":[0.041,0.0393,0.3192,0.0944,0.0505,0.1761,0.1523]},{"id":"P02","fam":"patrol","name":"Austal Patrol 40","L":60,"p":[0.0445,0.0388,0.3277,0.1071,0.0713,0.2071,0.0922]},{"id":"P03","fam":"patrol","name":"Austal Patrol 58","L":60,"p":[0.043,0.0639,0.3126,0.0859,0.0476,0.1932,0.1484]},{"id":"Y01","fam":"yacht","name":"Boardwalk","L":76,"p":[0.1226,0.0347,0.4023,0.093,0.0711,0.1258,0.0426]},{"id":"Y02","fam":"yacht","name":"Deep Blue","L":55,"p":[0.1952,0.0282,0.3552,0.073,0.0202,0.1149,0.1036]},{"id":"Y03","fam":"yacht","name":"O'Ptasia","L":84,"p":[0.1619,0.0542,0.3616,0.0622,0.0789,0.125,0.0934]},{"id":"Y04","fam":"yacht","name":"Quattroelle","L":88,"p":[0.161,0.0577,0.3669,0.0921,0.063,0.132,0.0563]},{"id":"Y05","fam":"yacht","name":"Seven Seas","L":110,"p":[0.1881,0.0376,0.3934,0.0924,0.0687,0.0965,0.0658]},{"id":"Y06","fam":"yacht","name":"Sophia","L":101,"p":[0.1779,0.0421,0.3524,0.1032,0.0675,0.1143,0.0823]}];
+
+  var pct = function (v) { return (v * 100).toFixed(1) + "%"; };
+
+  // Legend
+  var legend = document.getElementById("chart-legend");
+  CLASSES.forEach(function (k) {
+    var li = document.createElement("li");
+    li.innerHTML = '<span class="sw" style="--c:' + k.c + '"></span>' + k.label;
+    legend.appendChild(li);
+  });
+
+  // Rows
+  var rows = document.getElementById("chart-rows");
+  FAMILIES.forEach(function (fam) {
+    var ships = SHIPS.filter(function (s) { return s.fam === fam.key; });
+    var row = document.createElement("div");
+    row.className = "fam";
+    var name = document.createElement("div");
+    name.className = "fam-name";
+    name.innerHTML = "<strong>" + fam.name + "</strong><span>Generated length " + fam.L + "</span><span>" +
+      ships.length + " real references</span>";
+    row.appendChild(name);
+
+    var list = document.createElement("div");
+    list.className = "ships";
+    ships.forEach(function (s) {
+      var vals = s.p.slice();
+      var rest = Math.max(0, 1 - vals.reduce(function (a, b) { return a + b; }, 0));
+      vals.push(rest);
+      s.vals = vals;
+
+      var el = document.createElement("div");
+      el.className = "ship";
+      el.tabIndex = 0;
+      el.setAttribute("role", "img");
+      el.setAttribute("aria-label", s.id + ", " + s.name + ", " + s.L + " metres. " +
+        CLASSES.map(function (k, i) { return k.label + " " + pct(vals[i]); }).join(", "));
+      var bar = '<div class="bar">' + vals.map(function (v, i) {
+        return '<span class="seg" data-i="' + i + '" style="--f:' + v.toFixed(4) + ';--c:' + CLASSES[i].c + '"></span>';
+      }).join("") + "</div>";
+      el.innerHTML = '<span class="ship-id" aria-hidden="true">' + s.id + "</span>" + bar;
+      el._ship = s;
+      list.appendChild(el);
+    });
+    row.appendChild(list);
+    rows.appendChild(row);
+  });
+
+  // Tooltip
+  var tip = document.getElementById("tip");
+  var active = null;
+
+  function fill(s, hi) {
+    tip.innerHTML = '<div class="tip-head">' + s.id + " " + s.name + '</div><div class="tip-sub">Length ' + s.L + " m</div>" +
+      CLASSES.map(function (k, i) {
+        return '<div class="tip-row' + (i === hi ? " hl" : "") + '"><span class="sw" style="--c:' + k.c + '"></span><span>' +
+          k.label + "</span><b>" + pct(s.vals[i]) + "</b></div>";
+      }).join("");
+  }
+  function place(x, y) {
+    var w = tip.offsetWidth, h = tip.offsetHeight, pad = 12;
+    var left = x + 16, top = y + 16;
+    if (left + w + pad > window.innerWidth) left = x - w - 16;
+    if (left < pad) left = pad;
+    if (top + h + pad > window.innerHeight) top = y - h - 16;
+    if (top < pad) top = pad;
+    tip.style.left = left + "px";
+    tip.style.top = top + "px";
+  }
+  function show(el, hi, x, y) {
+    if (active && active !== el) active.classList.remove("is-active");
+    active = el;
+    el.classList.add("is-active");
+    fill(el._ship, hi);
+    tip.classList.add("on");
+    if (x == null) {
+      var r = el.getBoundingClientRect();
+      x = r.left + Math.min(r.width * 0.5, 260);
+      y = r.bottom - 8;
+    }
+    place(x, y);
+  }
+  function hide() {
+    tip.classList.remove("on");
+    if (active) active.classList.remove("is-active");
+    active = null;
+  }
+
+  rows.addEventListener("pointermove", function (e) {
+    var el = e.target.closest(".ship");
+    if (!el) { if (e.pointerType === "mouse") hide(); return; }
+    var seg = e.target.closest(".seg");
+    show(el, seg ? +seg.dataset.i : -1, e.clientX, e.clientY);
+  });
+  rows.addEventListener("pointerleave", function (e) { if (e.pointerType === "mouse") hide(); });
+  rows.addEventListener("click", function (e) {
+    var el = e.target.closest(".ship");
+    if (!el) return;
+    var seg = e.target.closest(".seg");
+    show(el, seg ? +seg.dataset.i : -1, e.clientX, e.clientY);
+  });
+  rows.addEventListener("focusin", function (e) {
+    var el = e.target.closest(".ship");
+    if (el) show(el, -1);
+  });
+  rows.addEventListener("focusout", hide);
+  document.addEventListener("pointerdown", function (e) { if (!e.target.closest(".ship")) hide(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") hide(); });
+  window.addEventListener("scroll", function () { if (active && document.activeElement !== active) hide(); }, { passive: true });
+
+  // Morph animation: autoplay unless the visitor prefers reduced motion, pause when off screen
+  var video = document.getElementById("morph");
+  var toggle = document.getElementById("motion-toggle");
+  if (video && toggle) {
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var userPaused = reduce;
+    var inView = true;
+    var label = toggle.querySelector("span");
+    var sync = function () {
+      var paused = userPaused;
+      toggle.classList.toggle("is-paused", paused);
+      label.textContent = paused ? "Play animation" : "Pause animation";
+    };
+    var run = function () {
+      if (!userPaused && inView) {
+        var pr = video.play();
+        if (pr && pr.catch) pr.catch(function () { userPaused = true; sync(); });
+      } else {
+        video.pause();
+      }
+    };
+    toggle.hidden = false;
+    toggle.addEventListener("click", function () { userPaused = !userPaused; sync(); run(); });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (entries) {
+        inView = entries[0].isIntersecting; run();
+      }, { threshold: 0.05 }).observe(video);
+    }
+    sync(); run();
+  }
+
+  // Copy buttons
+  document.querySelectorAll(".code").forEach(function (box) {
+    var btn = document.createElement("button");
+    btn.className = "copy";
+    btn.type = "button";
+    btn.textContent = "Copy";
+    btn.addEventListener("click", function () {
+      var text = box.querySelector("code").innerText;
+      var done = function () {
+        btn.textContent = "Copied";
+        setTimeout(function () { btn.textContent = "Copy"; }, 1600);
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done, function () { fallback(text); done(); });
+      } else { fallback(text); done(); }
+    });
+    box.appendChild(btn);
+  });
+  function fallback(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "absolute"; ta.style.left = "-9999px";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); } catch (err) {}
+    document.body.removeChild(ta);
+  }
+
+  // Tabs
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  function select(t) {
+    tabs.forEach(function (o) {
+      var on = o === t;
+      o.setAttribute("aria-selected", on ? "true" : "false");
+      o.tabIndex = on ? 0 : -1;
+      document.getElementById(o.getAttribute("aria-controls")).hidden = !on;
+    });
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener("click", function () { select(t); });
+    t.addEventListener("keydown", function (e) {
+      var n = null;
+      if (e.key === "ArrowRight") n = tabs[(i + 1) % tabs.length];
+      if (e.key === "ArrowLeft") n = tabs[(i - 1 + tabs.length) % tabs.length];
+      if (n) { e.preventDefault(); select(n); n.focus(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
