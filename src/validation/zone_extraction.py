@@ -572,7 +572,8 @@ def build_conditioning(
 ) -> np.ndarray:
     """
     Build global conditioning vector (18 dims).
-    Matches _build_conditioning in graph_builder.py.
+    Legacy real-reference/CC format; the synthetic graph_builder uses 16 dims.
+    parameter_cond_vector() removes CG slots 9-10 for shared coverage metrics.
 
         [0-5]   ship_type one-hot (6 dims)
         [6]     L_norm

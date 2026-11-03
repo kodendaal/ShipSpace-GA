@@ -25,8 +25,8 @@ This means the graph has a clean separation between:
                sees these; during inference the decoder produces them.
 
     cond     — GLOBAL conditioning vector (ship-level requirements).
-               Ship type (one-hot), normalised dimensions, physics targets,
-               volume budget fractions.  Fed into both encoder and decoder.
+               Ship type (one-hot), normalised dimensions and seven programme
+               fractions (16 values). Physics targets are separate aux_physics metadata.
 
     edge_index, edge_attr — graph topology and edge features (fixed).
 
@@ -95,7 +95,7 @@ N_BUDGET_KEYS = len(BUDGET_KEYS)
 
 # Conditioning contract: 6 ship types + 3 dimensions + 7 budgets.
 N_COND_DIMS = N_SHIP_TYPES + 3 + N_BUDGET_KEYS
-GENERATOR_VERSION = "v5.4-voidfix-hardened"
+GENERATOR_VERSION = "v1.0"
 
 # Normalisation ranges for L, B, D (union of all ship type ranges)
 NORM_L = (51.0, 280.0)
@@ -343,8 +343,8 @@ def _build_conditioning(
     Global conditioning vector (16 dims).
 
     LCG/KG are not part of the conditioning:
-    CG is an OUTPUT of the layout, not a steering input. Physics control is
-    deferred to differential post-optimisation. Targets and achieved values
+    Achieved CG is a layout output. Sampled CG targets guide generator
+    assignment/refinement, but neither is a model input in cond_version=2. Targets and achieved values
     are still STORED on the graph as `aux_physics` (see build_graph) so they
     can be re-introduced as conditioning later without regenerating data.
 

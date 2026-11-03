@@ -1,6 +1,6 @@
 # Data provenance
 
-This document records the external geometric and general-arrangement sources used to support generator development and evaluation. The published synthetic corpus is archived on Zenodo with this release.
+This document records the external geometric and general-arrangement sources used to support generator development and evaluation. The published 50K synthetic corpus is archived separately at [the dataset DOI](https://doi.org/10.5281/zenodo.23197299).
 
 ## Production hull templates
 
@@ -75,4 +75,4 @@ The graphs and metadata shipped with this repository are in `data/real_ga/` (`re
 - **Experiment 3:** one fixed real-reference exterior envelope per family.
 - **Fixed-hull OSV application:** the same OSV reference/hull envelope used in the OSV reconstruction/controllability studies.
 
-The large generated corpora are archived on Zenodo with this release.
+The 50K generated corpus and the software have separate DOI records. See [RELEASE.md](RELEASE.md).

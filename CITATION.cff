@@ -1,13 +1,11 @@
 cff-version: 1.2.0
-
-message: "If you use ShipSpace-GA in your research, please cite the accompanying paper."
-
+message: "Please cite the accompanying paper for the method, and the software and dataset DOIs for the artifacts used."
 title: "ShipSpace-GA"
 type: software
-version: "1.0.0"
-doi: "10.5281/zenodo.23196765"
+# Candidate software release; Generator v1.0 is retained.
+version: "1.0.1"
+# Add a software DOI only after its correspondence is verified (docs/RELEASE.md).
 repository-code: "https://github.com/kodendaal/ShipSpace-GA"
-
 authors:
   - family-names: "Odendaal"
     given-names: "Kirsten"
@@ -15,16 +13,17 @@ authors:
   - family-names: "de Winter"
     given-names: "Roy"
     orcid: "https://orcid.org/0000-0002-0865-4709"
-
-# preferred-citation:
-#   type: conference-paper
-#   title: "Procedural Generation of 3D Ship Internal Arrangements for Design-Space Exploration"
-#
-#   authors:
-#     - family-names: "Odendaal"
-#       given-names: "Kirsten"
-#     - family-names: "de Winter"
-#       given-names: "Roy"
-#
-#   year: 2027
-#   status: in-preparation
+preferred-citation:
+  type: article
+  title: "Procedural Generation of Conceptual 3D Ship Internal Arrangements for Design-Space Exploration"
+  authors:
+    - family-names: "Odendaal"
+      given-names: "Kirsten"
+      orcid: "https://orcid.org/0000-0002-4522-3828"
+    - family-names: "de Winter"
+      given-names: "Roy"
+      orcid: "https://orcid.org/0000-0002-0865-4709"
+  year: 2026
+  journal: "arXiv"
+  doi: "10.48550/arXiv.2610.09585"
+  url: "https://arxiv.org/abs/2610.09585"

@@ -1,6 +1,6 @@
 # Generator specification
 
-This document describes the version 1.0 procedural generator at the level needed to interpret and reproduce the released design space. The Python modules in `src/data_generator/` remain the canonical numerical implementation.
+This document describes the Generator v1.0 procedural implementation at the level needed to interpret and reproduce the released design space. The Python modules in `src/data_generator/` remain the canonical numerical implementation.
 
 ## Coordinate convention
 
@@ -165,6 +165,10 @@ A later label-refinement step may swap eligible functional labels to improve LCG
 | Voxel conversion | `representation_converters.py` |
 | Compact companions | `companion.py`, `deck_codec.py` |
 | Batch generation | `dataset_builder.py` |
+
+## Engineering evaluation
+
+The optional [P1A engineering evaluator](ENGINEERING.md) applies calibrated whole-ship mass, adjacency, hydrostatic trim and free-surface corrections to existing native arrangements. It does not change assignment or production QC. The relative mass parameters above describe the generator diagnostics, not the full calibrated evaluator.
 
 ## Important interpretation
 

@@ -1,7 +1,8 @@
 """Generate the synthetic general-arrangement dataset.
 
-The defaults reproduce the published dataset: 8,333 arrangements per ship type
-(49,998 in total), seed 42, 16 workers. Each worker has its own random stream,
+The defaults request 8,333 arrangements per ship type (49,998 in total),
+seed 42, 16 workers. Matching these settings does not establish sample-for-sample
+reproduction of the frozen corpus; see docs/DATASET.md. Each worker has its own random stream,
 so --workers changes the samples; --processes only sets how many workers run
 at the same time.
 
