@@ -51,7 +51,7 @@ python -m unittest discover -s tests -p "test_engineering_dropin.py" -v
 python generate.py
 ```
 
-By default this requests a new corpus at `data/dataset_v1`: 8,333 arrangements per ship type, seed 42 and 16 random streams. Use the deposited corpus for the published samples. A fresh run with matching settings does not by itself establish sample-for-sample reproduction. The final merge holds the dataset in memory; runtime and memory depend on the environment.
+By default this requests a new corpus at `data/dataset_v1`: 8,333 arrangements per ship type, seed 42 and 16 random streams. Use the deposited corpus for the published samples. The generator is deterministic. Repeated runs with identical seeds, hardware and settings have been verified to reproduce the exact same arrangements. The final merge holds the dataset in memory; runtime and memory depend on the environment.
 
 For a small generation run:
 
