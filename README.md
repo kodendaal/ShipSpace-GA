@@ -29,7 +29,7 @@ Each arrangement is stored as a voxel and graph representation. Every zone of th
 
 The published **50K synthetic corpus** has its own [dataset DOI](https://doi.org/10.5281/zenodo.23197299). This repository contains the generator, validation tools, P1A engineering evaluator, production hull masks and 23 reconstructed real general arrangements. Place the archived corpus at `data/dataset_v1` to use the defaults below.
 
-This branch prepares software release **v1.0.1**, completing the P1A repository while retaining Generator v1.0. The existing `v1.0.0` tag and archived dataset remain unchanged. See the [release correspondence and checklist](docs/RELEASE.md).
+Software release **v1.0.1** was published on 3 November 2026 and is archived at [10.5281/zenodo.23913344](https://doi.org/10.5281/zenodo.23913344). It completes the P1A repository while retaining Generator v1.0. The existing `v1.0.0` tag and dataset v1.0.0 remain unchanged. See the [release and archive correspondence](docs/RELEASE.md).
 
 ## Install
 
@@ -195,4 +195,4 @@ The code is MIT-licensed. The data in `data/` is licensed under CC BY 4.0. See `
 
 ## Citation
 
-Cite the [P1A paper](https://arxiv.org/abs/2610.09585) for the method, the software version actually used for the implementation, and the [dataset DOI](https://doi.org/10.5281/zenodo.23197299) for the released corpus. `CITATION.cff` contains the paper citation and candidate software version. The software badge links all versions. The [v1.0.0 software DOI](https://doi.org/10.5281/zenodo.23196765) identifies the earlier release; v1.0.1 will receive its own DOI when archived.
+Cite the [P1A paper](https://arxiv.org/abs/2610.09585) for the method, the software version actually used, and the [dataset v1.0.0 DOI](https://doi.org/10.5281/zenodo.23197299) for the released corpus. The [software v1.0.1 DOI](https://doi.org/10.5281/zenodo.23913344) identifies the completed P1A software distribution; the [software v1.0.0 DOI](https://doi.org/10.5281/zenodo.23196765) identifies the original release. `CITATION.cff` records software v1.0.1 and the paper citation. The software badge links the [software version family](https://doi.org/10.5281/zenodo.23196764).

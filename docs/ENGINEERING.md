@@ -30,9 +30,10 @@ optional equilibrium trim and free-surface-corrected GM for Generator v1.0.
 - The archive's illustrative NPZ and installation-only README are not shipped
   as scientific fixtures. This document replaces those installation notes.
 
-The existing software DOI and v1.0.0 tag describe the archived release. Adding
-these files to a branch or merging them does not update that deposit. Record
-the source commit and calibration hash with any new results.
+This evaluator is included in [software v1.0.1](https://doi.org/10.5281/zenodo.23913344),
+published on 3 November 2026. The original software v1.0.0 archive remains
+available as its historical checkpoint. Record the source commit and
+calibration hash with any new results; see [RELEASE.md](RELEASE.md).
 
 ## Installation and checks
 
@@ -160,4 +161,4 @@ case, use that case's exact native geometry, assignment, dimensions, loading
 convention and calibration. The original experiment and calibration-fitting
 runners are not included in this restored evaluation package.
 
-See [RELEASE.md](RELEASE.md) for the software checkpoint and archive steps.
+See [RELEASE.md](RELEASE.md) for the published software checkpoint and archive correspondence.
